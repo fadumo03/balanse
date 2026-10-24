@@ -19,6 +19,28 @@
     0: { label: "Lett", activity: "Gåtur, yoga eller tøying" }
   };
 
+  // Brukerens egne økter per intensitet. Appen velger fra disse,
+  // så man slipper å bestemme seg hver dag.
+  const DEFAULT_TEMPLATES = {
+    2: ["Styrke: knebøy, push-ups, utfall og planke – 3 runder", "Intervaller: 4 × 4 min hardt løp", "Spinning eller gruppetime"],
+    1: ["Rolig løpetur", "Sykkeltur", "Svømming"],
+    0: ["Gåtur ute", "Yoga", "Tøying og mobilitet"]
+  };
+
+  // Velger en økt fra listen ut fra datoen, slik at det varierer fra dag til dag.
+  function templateFor(templates, level, dayKey) {
+    const list = (templates && templates[level] && templates[level].length) ? templates[level] : DEFAULT_TEMPLATES[level];
+    const [y, m, d] = dayKey.split("-").map(Number);
+    const dayNumber = Math.round(Date.UTC(y, m - 1, d) / 86400000);
+    return list[dayNumber % list.length];
+  }
+
+  function minutesForLevel(level, sessionMinutes) {
+    if (level === 2) return sessionMinutes;
+    if (level === 1) return roundTo(sessionMinutes * 0.75, 5);
+    return clamp(roundTo(sessionMinutes * 0.5, 5), 20, 30);
+  }
+
   // ---------- Datohjelpere (lokale datoer som "ÅÅÅÅ-MM-DD") ----------
   function toKey(date) {
     const y = date.getFullYear();
@@ -167,21 +189,14 @@
         }
         if (isExamDay) level = 0;
 
-        let minutes;
-        if (!plannedSession) {
-          minutes = isExamDay ? 20 : 15; // aktiv pause, ikke en full økt
-        } else if (level === 2) {
-          minutes = settings.sessionMinutes;
-        } else if (level === 1) {
-          minutes = roundTo(settings.sessionMinutes * 0.75, 5);
-        } else {
-          minutes = clamp(roundTo(settings.sessionMinutes * 0.5, 5), 20, 30);
-        }
+        const minutes = plannedSession
+          ? minutesForLevel(level, settings.sessionMinutes)
+          : isExamDay ? 20 : 15; // aktiv pause, ikke en full økt
 
         training = {
           level,
           label: plannedSession ? ACTIVITIES[level].label : "Aktiv pause",
-          activity: plannedSession ? ACTIVITIES[level].activity : "Gåtur ute",
+          activity: plannedSession ? templateFor(state.templates, level, key) : "Gåtur ute",
           minutes,
           isSession: plannedSession
         };
@@ -231,6 +246,10 @@
 
   const api = {
     DEFAULT_SETTINGS,
+    DEFAULT_TEMPLATES,
+    ACTIVITIES,
+    templateFor,
+    minutesForLevel,
     toKey,
     parseKey,
     addDays,

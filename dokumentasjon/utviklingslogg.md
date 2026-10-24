@@ -3,9 +3,10 @@
 Denne loggen viser hvordan appen ble til med vibe coding i Claude Code, fra første idé til dagens versjon.
 For hver versjon står det hva jeg ba om, hva KI-en gjorde, hvordan appen ble testet, og skjermbilder.
 
-Begge versjonene finnes i koden:
+Alle versjonene finnes i koden:
 - **Versjon 1** ligger urørt i mappen [`versjon-1/`](../versjon-1/) og i git-taggen `v1`.
-- **Versjon 2** er hovedappen i rotmappen (git-taggen `v2`).
+- **Versjon 2** ligger urørt i mappen [`versjon-2/`](../versjon-2/) og i git-taggen `v2`.
+- **Versjon 3** er hovedappen i rotmappen (git-taggen `v3`).
 
 ---
 
@@ -87,6 +88,69 @@ Begge versjonene finnes i koden:
 | Logg | Eksamener | Mål + temavelger | Lavendel-tema |
 |---|---|---|---|
 | ![Logg](skjermbilder/versjon-2/5-logg.jpg) | ![Eksamener](skjermbilder/versjon-2/6-eksamener.jpg) | ![Mål](skjermbilder/versjon-2/7-maal-tema.jpg) | ![Lavendel](skjermbilder/versjon-2/8-tema-lavendel.jpg) |
+
+---
+
+## Versjon 3 – timer, hage og egne treningsøkter
+
+### Tilbakemelding etter å ha prøvd versjon 2 (mine prompter)
+
+> liker ikke premie systemet fordi det sier meg inegnting lmom jeg er uknuselig. ta inspo fra garden study eller hva enn d heter
+> hvor man låser opp. btw ha en timer for study. ikke bare at man huker av, da er d lett å lyve. så hvis man leser la oss si 45 min
+> i strekk, så vinner man en speisifkkk item som kan brueks til et eller annet. brainstorm ideer på tekst før du bygger noe
+
+Først kom KI-en med forslag i tekst, uten å bygge noe: en hage (inspirert av Forest), et studentrom eller et akvarium,
+en tabell over hvilken plante du får for hvor lang økt, ting du kan vinne og hva de brukes til,
+og spørsmålet om hvor streng appen skal være når man går ut av den. Så valgte jeg:
+
+> hage, snill. trening kan krysses av? eller skal d være detaljert for å ta bort decision fatigue hvor man kan sette inn selv.
+> og redigere upper day osv idk
+
+### Hva KI-en gjorde
+
+- **Timer i stedet for avkrysning for lesing.** Du trykker «▶ Les nå» og velger en plante. Lengden på økta avgjør planten:
+  🌱 Spire 25 min, 🌷 Tulipan og 🌻 Solsikke 45 min, 🌳 Tre 60 min og 🌸 Kirsebærtre 90 min.
+  Planten gror på skjermen mens nedtellingen går. Lesetiden i ukeplanen fylles bare av ekte timer-tid.
+- **Snill modus mot juks.** Skjermen holdes på mens du leser. Du kan gå ut av appen i inntil 2 minutter.
+  Er du borte lenger, eller trykker «Gi opp», visner planten 🥀. Den visne planten blir stående i hagen.
+- **Hagen** erstatter merkene. Her ser du alle plantene dine, og været følger søvnloggen:
+  ☀️ sol når du har sovet godt, 🌧️ regn når du har sovet lite eller er stresset.
+- **Ting du vinner og kan bruke:**
+  - 💧 **Vann** (når du har trent, maks én per dag) – trykk på en plante for å få den til å blomstre. Dette binder sammen lesing og trening.
+  - 🌾 **Gjødsel** (etter 3 økter på én dag) – gir en gyllen plante ✨ neste økt.
+  - 🧊 **Streak-frys** (for hver 7. dag på rad) – redder streaken automatisk hvis du glemmer en dag.
+  - 🏵️ **Eksamensblomst** – når du fullfører en økt dagen før en eksamen.
+  - 🪑 **Pynt** (benk, lykt, sommerfugler, froskedam, fontene og mer) – låses opp etter antall timer lest, og du plasserer den selv i hagen.
+- **Frøkatalog**: viser alle plantene. De du ikke har ennå, vises som grå silhuetter med tekst om hva som skal til,
+  for eksempel «Les 60 min i strekk». Da vet du alltid hva du jobber mot.
+- **Trening uten «decision fatigue»**: Under *Mål* lager du dine egne økter for Hard, Moderat og Lett.
+  Appen velger fra listene hver dag. I ukeplanen kan du bytte økt eller sette hviledag på hver dag. Trening krysses fortsatt av.
+- Versjon 2 ble tatt vare på i `versjon-2/`.
+
+### Testing og forbedringer
+
+- **17 automatiske tester**, som alle besto. De 11 nye sjekker blant annet timeren (fortsetter, fullføres, visner etter 2 min),
+  at visne planter ikke gir minutter, gjødsel, streak-frys, eksamensblomst, at vann bare kan fås én gang per dag, pynt,
+  været og treningsmaler.
+- Testet i mobilstørrelse: hele timer-flyten (velg plante → timer → fullført økt), en plante som visner etter 3 min borte,
+  vanning av planter, plassering av pynt, bytte av treningsøkt og egne økter.
+- **Feil funnet under testing og rettet:**
+  - Himmelen øverst i hagen var usynlig når det regnet. CSS-klassen `rain` på himmelen kolliderte med regnlaget,
+    som også het `rain` og var skjult. Klassene fikk nye navn.
+  - Emojiene for gjødsel (🪴) og liljedam (🪷) vises som tomme firkanter på eldre enheter. De ble byttet til 🌾 og 🐸.
+  - «Bytt…»-menyen for trening stakk ut av kortet. Den er flyttet under teksten.
+  - En Hard økt valgt på en lett dag fikk bare 25 minutter. Nå styrer det valgte nivået minuttene.
+  - Eksempeldataene brukte opp alt vannet, så det var ingenting å teste vanning med. Nå er det vann igjen.
+
+### Skjermbilder – versjon 3
+
+| Uke: timer + egen økt | Velg plante | Timeren går | Økt fullført |
+|---|---|---|---|
+| ![Uke](skjermbilder/versjon-3/1-uke-timer-og-trening.jpg) | ![Velg](skjermbilder/versjon-3/2-velg-plante.jpg) | ![Timer](skjermbilder/versjon-3/3-timer-gaar.jpg) | ![Fullført](skjermbilder/versjon-3/4-okt-fullfort.jpg) |
+
+| Planten visnet | Hagen (regnvær) | Lager og pynt | Mine treningsøkter |
+|---|---|---|---|
+| ![Visnet](skjermbilder/versjon-3/5-planten-visnet.jpg) | ![Hagen](skjermbilder/versjon-3/6-hagen.jpg) | ![Lager](skjermbilder/versjon-3/7-lager-og-pynt.jpg) | ![Økter](skjermbilder/versjon-3/8-mine-treningsokter.jpg) |
 
 ---
 

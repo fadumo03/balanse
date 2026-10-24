@@ -7,25 +7,42 @@ Appen kjenner eksamensdatoene og treningsmålene dine:
 - **Når eksamen nærmer seg** skrur den opp lesetiden og ned treningsintensiteten,
   men kutter aldri trening helt, fordi bevegelse hjelper mot stress og gir bedre konsentrasjon.
 - **Du kan logge søvn og stressnivå**, og planen justeres etter det.
-  Har du sovet dårlig og vært stresset de siste dagene, blir treningen lettere og leseøktene litt kortere,
-  og du får et søvntips.
+- **Du leser med timer**, og hver fullført økt gror en plante i hagen din. Gir du opp, visner planten.
+  Da kan du ikke bare krysse av for lesing du ikke har gjort.
 
 ## Problemet appen løser
 
 Mange studenter slutter helt å trene i eksamensperioden, eller de trener like hardt som før og blir utslitte.
-Balanse finner en mellomvei automatisk, slik at du slipper å planlegge alt selv.
+Balanse finner en mellomvei automatisk. Hagen gir deg en ærlig og synlig belønning for faktisk lesetid.
 
 ## Funksjoner
 
 | Fane | Hva den gjør |
 |---|---|
-| **Uke** | Ukeplan dag for dag med lesetid og treningsøkt. Du krysser av for det du har gjort. Knappen «Hvorfor?» forklarer hver anbefaling. Du kan bla mellom uker. |
-| **Logg** | Logg timer søvn og stressnivå (1–5) og se en graf for de siste 14 dagene. |
-| **Premier** | Lese-streak, poeng, nivå og 9 merker som låses opp. Du får en melding og konfetti når du krysser av. |
+| **Uke** | Ukeplan dag for dag. Lesing startes med «▶ Les nå» og fylles av timer-tid. Trening hentes fra dine egne økter, kan byttes per dag og krysses av. «Hvorfor?» forklarer hver anbefaling. Streak-kortet viser hvor mange dager på rad du har lest. |
+| **Logg** | Logg søvn og stress (1–5) og se en graf for de siste 14 dagene. Påvirker planen og været i hagen. |
+| **Hage** | Alle plantene dine, været, lageret (💧 vann, 🌾 gjødsel, 🧊 streak-frys), pynt du kan plassere og en frøkatalog over alle plantene. |
 | **Eksamener** | Legg til og slett eksamener med nedtelling. |
-| **Mål** | Treningsøkter per uke, minutter per økt, vanlig lesetid og maks lesetid. Velg mellom 5 temaer (Mint, Fersken, Lavendel, Hav og Natt). Her kan du også laste inn eksempeldata til demo. |
+| **Mål** | Treningsmål, lesetid, dine egne treningsøkter for Hard, Moderat og Lett, 5 temaer og eksempeldata til demo. |
 
-Øverst i ukeplanen viser streak-kortet hvor mange dager på rad du har lest, og det motiverer deg til å lese i dag også.
+### Leseøkt med timer
+
+| Økt i strekk | Plante |
+|---|---|
+| 25 min | 🌱 Spire |
+| 45 min | 🌷 Tulipan eller 🌻 Solsikke |
+| 60 min | 🌳 Tre |
+| 90 min | 🌸 Kirsebærtre |
+
+Skjermen holdes på under økta. **Snill modus:** Du kan gå ut av appen i inntil 2 minutter. Er du borte lenger, visner planten.
+
+### Ting du vinner
+
+- 💧 **Vann:** fås når du har trent, maks én per dag. Får en plante til å blomstre.
+- 🌾 **Gjødsel:** fås etter 3 økter på én dag. Neste plante blir gyllen ✨.
+- 🧊 **Streak-frys:** fås for hver 7. dag på rad. Redder streaken automatisk en dag du glemmer.
+- 🏵️ **Eksamensblomst:** fås når du fullfører en økt dagen før en eksamen.
+- 🪑 **Pynt:** låses opp etter totalt antall timer lest, og du plasserer den selv i hagen.
 
 ## Slik regner appen ut planen
 
@@ -34,17 +51,19 @@ Balanse finner en mellomvei automatisk, slik at du slipper å planlegge alt selv
 2. **Lesetid** = vanlig lesetid + press × (maks lesetid − vanlig lesetid). I rolige helger leser du mindre.
    På eksamensdagen er det bare 30 minutter lett repetisjon.
 3. **Trening**: økter fordeles jevnt utover uka. Intensiteten blir *Hard* når presset er under 0,3,
-   *Moderat* når det er under 0,7, og ellers *Lett*. På dager med høyt press uten planlagt økt legges det inn en kort gåtur som aktiv pause.
+   *Moderat* når det er under 0,7, og ellers *Lett*. Selve økta hentes fra listene dine. På dager med høyt press
+   uten planlagt økt legges det inn en kort gåtur som aktiv pause.
 4. **Overskudd** fra søvn og stress (snitt av de tre siste loggede dagene). Er overskuddet lavt, går treningen ned ett hakk,
    lesetiden ned 15 %, og du får et søvntips.
 
-Planlogikken ligger i [`plan.js`](plan.js) og belønningslogikken (streak, poeng og merker) i [`rewards.js`](rewards.js).
+Planlogikken ligger i [`plan.js`](plan.js) og hagelogikken (timer, planter, ting og streak) i [`garden.js`](garden.js).
 Begge er skilt fra brukergrensesnittet ([`app.js`](app.js)), slik at de kan testes for seg.
 
 ## Teknologi
 
 - Ren HTML, CSS og JavaScript, uten rammeverk og uten byggesteg.
 - PWA: `manifest.json` og service worker (`sw.js`) gjør at appen kan legges på hjemskjermen og fungerer uten nett.
+- Screen Wake Lock API holder skjermen på under leseøkter.
 - Data lagres bare lokalt på enheten (`localStorage`). Ingen innlogging, server eller persondata sendes noe sted.
 
 ## Kjøre lokalt
@@ -53,17 +72,16 @@ Begge er skilt fra brukergrensesnittet ([`app.js`](app.js)), slik at de kan test
 python -m http.server 8080
 ```
 
-Åpne deretter <http://localhost:8080>.
+Åpne deretter <http://localhost:8080>. Tidligere versjoner ligger på `/versjon-1/` og `/versjon-2/`.
 
 ## Tester
 
 ```bash
-node --test tests/plan.test.js tests/rewards.test.js
+node --test tests/plan.test.js tests/garden.test.js
 ```
 
-De 12 testene sjekker blant annet at rolige uker gir en ekstra økt, at eksamen gir mer lesing og lettere trening,
-at trening aldri kuttes helt, at lite søvn og høyt stress skrur ned belastningen, at datoer håndteres riktig over sommertidsskiftet,
-og at streak, poeng og merker regnes riktig.
+De 17 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
+og hagen (timer og visning, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler).
 
 ## Legge appen på telefonen
 
@@ -76,8 +94,10 @@ Appen er laget med vibe coding i **Claude Code** (Claude Opus 5.5).
 Hele prosessen, med promptene mine, hva som ble endret, testing og skjermbilder av hver versjon, står i
 **[utviklingsloggen](dokumentasjon/utviklingslogg.md)**.
 
-1. **Versjon 1:** Jeg beskrev ideen min på norsk. KI-en foreslo å lage en PWA og skrev planleggingslogikk, grensesnitt,
-   PWA-filer og 6 tester. Appen ble testet i nettleser i mobilstørrelse. Den ligger urørt i [`versjon-1/`](versjon-1/).
-2. **Versjon 2:** Etter å ha prøvd appen syntes jeg den var for mørk og manglet motivasjon. Jeg ba om et lysere design,
-   belønninger og streaks, og temaer å velge mellom. KI-en la til streak-kort, poeng, nivåer, merker, konfetti og 5 temaer,
-   pluss 6 nye tester. Under testingen ble en layoutfeil funnet og rettet.
+1. **Versjon 1** ([`versjon-1/`](versjon-1/)): Jeg beskrev ideen min. KI-en foreslo å lage en PWA og skrev planlogikk,
+   grensesnitt og tester.
+2. **Versjon 2** ([`versjon-2/`](versjon-2/)): Appen var for mørk og manglet motivasjon. Den fikk et lyst design,
+   streaks, poeng, merker og 5 temaer.
+3. **Versjon 3**: Merkene sa meg ingenting, og avkrysning var lett å jukse med. Jeg ba KI-en brainstorme først.
+   Så valgte jeg en hage med timer (inspirert av Forest) i snill modus, ting man vinner og kan bruke, og egne treningsøkter
+   for å slippe «decision fatigue». Under testingen ble fem feil funnet og rettet.

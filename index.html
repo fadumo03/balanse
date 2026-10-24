@@ -10,7 +10,7 @@
     // Sett valgt tema før siden tegnes, så det ikke blinker.
     try {
       var saved = JSON.parse(localStorage.getItem("balanse-v1") || "{}");
-      if (saved.settings && saved.settings.theme) document.documentElement.dataset.theme = saved.settings.theme;
+      if (saved.settings && saved.settings.theme && saved.settings.theme !== "mint") document.documentElement.dataset.theme = saved.settings.theme;
     } catch (e) {}
   </script>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -43,7 +43,7 @@
     <!-- LOGG -->
     <section id="view-log" class="view" aria-label="Søvn og stress">
       <header class="top"><div class="top-title"><h1>Søvn og stress</h1>
-        <p class="muted">Planen justeres etter hvordan du har det</p></div></header>
+        <p class="muted">Planen og været i hagen justeres etter hvordan du har det</p></div></header>
       <form id="log-form" class="card">
         <label class="field">Dato
           <input type="date" id="log-date" required>
@@ -71,16 +71,34 @@
       </div>
     </section>
 
-    <!-- PREMIER -->
-    <section id="view-rewards" class="view" aria-label="Premier">
-      <header class="top"><div class="top-title"><h1>Premier</h1>
-        <p class="muted">Kryss av lesing og trening for å samle poeng</p></div></header>
-      <div id="level-card" class="card level-card"></div>
-      <div class="card">
-        <h2>Merker</h2>
-        <div id="badge-grid" class="badge-grid"></div>
+    <!-- HAGE -->
+    <section id="view-garden" class="view" aria-label="Hagen din">
+      <div id="sky" class="sky">
+        <div class="sky-text">
+          <h1>Hagen din</h1>
+          <p id="weather-text"></p>
+        </div>
+        <span id="weather-icon" class="weather-icon"></span>
+        <div class="rain-drops" aria-hidden="true"></div>
       </div>
-      <p class="muted small">Poeng: 10 per leseøkt + 1 per 15 min lest, 5 per treningsøkt. 100 poeng = nytt nivå.</p>
+      <div id="garden-stats" class="garden-stats"></div>
+      <div id="place-hint" class="place-hint" hidden></div>
+      <div id="garden-grid" class="garden-grid"></div>
+      <button class="primary start-big" data-open-focus>▶ Start leseøkt</button>
+
+      <div class="card">
+        <h2>Lager</h2>
+        <div id="inventory" class="inventory"></div>
+      </div>
+      <div class="card">
+        <h2>Pynt</h2>
+        <p class="muted small">Låses opp etter hvor mange timer du har lest. Trykk «Plasser» og så på en ledig rute.</p>
+        <div id="decor-list" class="decor-list"></div>
+      </div>
+      <div class="card">
+        <h2>Frøkatalog</h2>
+        <div id="catalog" class="badge-grid"></div>
+      </div>
     </section>
 
     <!-- EKSAMENER -->
@@ -119,6 +137,11 @@
         <p class="muted small">Endringer lagres automatisk.</p>
       </form>
       <div class="card">
+        <h2>Mine treningsøkter</h2>
+        <p class="muted small">Appen velger fra listene dine hver dag, så du slipper å bestemme deg. Du kan alltid bytte økt på en dag i ukeplanen.</p>
+        <div id="templates"></div>
+      </div>
+      <div class="card">
         <h2>Tema</h2>
         <div id="theme-picker" class="themes"></div>
       </div>
@@ -136,16 +159,56 @@
   <nav class="tabbar" aria-label="Hovedmeny">
     <button data-view="week" class="on"><span class="tab-ico">▦</span>Uke</button>
     <button data-view="log"><span class="tab-ico">☾</span>Logg</button>
-    <button data-view="rewards"><span class="tab-ico">★</span>Premier</button>
+    <button data-view="garden"><span class="tab-ico">✿</span>Hage</button>
     <button data-view="exams"><span class="tab-ico">✎</span>Eksamener</button>
     <button data-view="goals"><span class="tab-ico">◎</span>Mål</button>
   </nav>
+
+  <!-- FOKUS-TIMER -->
+  <div id="focus" class="focus" hidden>
+    <div class="focus-inner">
+      <div id="focus-pick">
+        <button class="icon-btn focus-close" data-close-focus aria-label="Lukk">×</button>
+        <h2>Hva vil du plante?</h2>
+        <p class="muted">Lengre økt i strekk gir en finere plante.</p>
+        <div id="seed-list" class="seed-list"></div>
+        <div id="exam-banner"></div>
+        <label id="golden-wrap" class="golden-toggle" hidden>
+          <input type="checkbox" id="use-golden">
+          <span>Bruk 🌾 gjødsel – gir en gyllen plante ✨ <small id="gjodsel-count" class="muted"></small></span>
+        </label>
+        <button class="primary" id="start-focus">Start</button>
+        <p class="muted small center">Skjermen holdes på mens du leser. Du kan gå ut av appen i inntil 2 minutter – er du borte lenger, visner planten.</p>
+      </div>
+
+      <div id="focus-run" hidden>
+        <div class="ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+            <circle id="ring-fg" class="ring-fg" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <span id="grow-plant" class="grow"></span>
+        </div>
+        <div id="countdown" class="countdown" role="timer">45:00</div>
+        <p id="focus-label" class="muted center"></p>
+        <button id="give-up" class="ghost">Gi opp</button>
+      </div>
+
+      <div id="focus-done" hidden>
+        <div id="done-icon" class="done-icon"></div>
+        <h2 id="done-title" class="center"></h2>
+        <ul id="done-rewards" class="reward-list"></ul>
+        <button class="primary" id="to-garden">Se hagen</button>
+        <button id="close-done" class="ghost">Lukk</button>
+      </div>
+    </div>
+  </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="confetti" class="confetti" aria-hidden="true"></div>
 
   <script src="plan.js"></script>
-  <script src="rewards.js"></script>
+  <script src="garden.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
