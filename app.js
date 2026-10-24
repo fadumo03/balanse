@@ -1,27 +1,31 @@
-// Balanse – brukergrensesnitt. Logikken for planen ligger i plan.js, hagen i garden.js.
+// Balanse – brukergrensesnitt. Logikken for planen ligger i plan.js, hagen i garden.js og ikonene i icons.js.
 (function () {
   "use strict";
 
   const B = window.Balanse;
   const G = window.Garden;
+  const { icon, art } = window.Icons;
   const STORAGE_KEY = "balanse-v1";
   const MONTHS = ["jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "des"];
   const THEMES = [
-    { id: "mint", name: "Mint", swatch: "linear-gradient(135deg,#e0f3ec,#1f8a70)", bar: "#f7faf8" },
-    { id: "fersken", name: "Fersken", swatch: "linear-gradient(135deg,#ffe3c4,#e8664a)", bar: "#fff8f3" },
-    { id: "lavendel", name: "Lavendel", swatch: "linear-gradient(135deg,#e9e2ff,#7457d6)", bar: "#f8f6fd" },
-    { id: "hav", name: "Hav", swatch: "linear-gradient(135deg,#d9f1ff,#1f78c1)", bar: "#f4f9fd" },
-    { id: "natt", name: "Natt", swatch: "linear-gradient(135deg,#2b2540,#14171c)", bar: "#14171c" }
+    { id: "mint", name: "Mint", swatch: "#1f8a70", bar: "#f7f8f7" },
+    { id: "fersken", name: "Fersken", swatch: "#e0684b", bar: "#faf7f5" },
+    { id: "lavendel", name: "Lavendel", swatch: "#6d5bd0", bar: "#f8f7fb" },
+    { id: "hav", name: "Hav", swatch: "#2472b8", bar: "#f5f8fa" },
+    { id: "natt", name: "Natt", swatch: "#1b1f24", bar: "#121417" }
   ];
   const WEATHER = {
-    sun: { icon: "☀️", text: "Sol i hagen – du har sovet godt og har lite stress." },
-    cloud: { icon: "⛅", text: "Litt skyet. Logg søvn og stress for å få sol." },
-    rain: { icon: "🌧️", text: "Regn i dag – lite søvn eller mye stress. Ta det litt roligere." }
+    sun: { icon: "sun", short: "Sol", text: "Sol i hagen – du har sovet godt og har lite stress." },
+    cloud: { icon: "cloud", short: "Skyet", text: "Litt skyet. Logg søvn og stress for å få sol." },
+    rain: { icon: "cloudRain", short: "Regn", text: "Regn i dag – lite søvn eller mye stress. Ta det litt roligere." }
   };
-  const CONFETTI_COLORS = ["#f07c1b", "#1f8a70", "#3b6fd4", "#e8664a", "#7457d6", "#f5c518"];
+  const CONFETTI_COLORS = ["#1f8a70", "#3b6fd4", "#f9c23c", "#ef6f98", "#9b87e8"];
   const RING = 2 * Math.PI * 90;
 
   const $ = (id) => document.getElementById(id);
+
+  // Statiske ikoner i HTML-en
+  for (const el of document.querySelectorAll("[data-icon]")) el.insertAdjacentHTML("afterbegin", icon(el.dataset.icon));
 
   // ---------- Lagring ----------
   function copyTemplates() {
@@ -112,10 +116,10 @@
       piece.style.left = `${Math.random() * 100}%`;
       piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
       piece.style.animationDelay = `${Math.random() * 0.4}s`;
-      piece.style.animationDuration = `${1 + Math.random() * 0.8}s`;
+      piece.style.animationDuration = `${1.1 + Math.random() * 0.8}s`;
       box.appendChild(piece);
     }
-    setTimeout(() => { box.innerHTML = ""; }, 2400);
+    setTimeout(() => { box.innerHTML = ""; }, 2500);
   }
 
   // ---------- Tema ----------
@@ -138,33 +142,35 @@
     applyTheme();
   });
 
-  // ---------- Streak ----------
+  // ---------- Nøkkeltall øverst ----------
   function plantsThisWeek() {
     const start = B.weekStart(today());
     const end = B.addDays(start, 6);
     return state.sessions.filter((s) => s.status === "grown" && s.minutes > 0 && s.day >= start && s.day <= end).length;
   }
 
-  function renderStreak() {
+  function renderStats() {
     const t = today();
     const streak = G.streak(state, t);
     const readToday = G.studyMinutes(state, t) > 0;
     const w = WEATHER[G.weather(state, t)];
+    const plants = plantsThisWeek();
 
     let message;
-    if (readToday) message = "Dagens økt er gjort – streaken er trygg! 🎉";
-    else if (streak > 0) message = `Fullfør en leseøkt i dag for å holde streaken på ${streak + 1} dager!`;
+    if (readToday) message = "Dagens økt er gjort. Streaken er trygg.";
+    else if (streak > 0) message = `Fullfør en leseøkt i dag for å holde streaken på ${streak + 1} dager.`;
     else message = "Start en leseøkt for å plante noe og starte en streak.";
 
     $("streak-card").innerHTML = `
-      <button class="card hero" data-go="garden" aria-label="Gå til hagen">
-        <span class="flame ${streak ? "" : "cold"}">🔥</span>
-        <span class="hero-text">
-          <span class="big">${streak} ${streak === 1 ? "dag" : "dager"} på rad</span>
-          <p>${message}</p>
-        </span>
-        <span class="lvl">${w.icon}<strong>🌱 ${plantsThisWeek()}</strong>denne uka</span>
-      </button>`;
+      <div class="stat-row">
+        <button class="stat" data-go="garden"><span class="stat-top"><span class="stat-ico flame ${streak ? "" : "off"}">${icon("flame")}</span><strong>${streak}</strong></span>
+          <small>${streak === 1 ? "dag" : "dager"} på rad</small></button>
+        <button class="stat" data-go="garden"><span class="stat-top"><span class="stat-ico leaf">${icon("sprout")}</span><strong>${plants}</strong></span>
+          <small>${plants === 1 ? "plante" : "planter"} denne uka</small></button>
+        <button class="stat" data-go="log"><span class="stat-top"><span class="stat-ico w-${G.weather(state, t)}">${icon(w.icon)}</span><strong>${w.short}</strong></span>
+          <small>vær i hagen</small></button>
+      </div>
+      <p class="hint">${message}</p>`;
   }
 
   // ---------- Trening per dag ----------
@@ -192,15 +198,15 @@
     }).join("");
     const hasOverride = !!state.trainingOverride[day.key];
     return `<select class="swap" data-swap="${day.key}" aria-label="Bytt treningsøkt ${day.name}">
-      <option value="">Bytt…</option>${groups}
+      <option value="">Bytt økt</option>${groups}
       <option value="rest">Hviledag</option>
-      ${hasOverride ? `<option value="reset">↺ Tilbake til forslaget</option>` : ""}
+      ${hasOverride ? `<option value="reset">Tilbake til forslaget</option>` : ""}
     </select>`;
   }
 
   // ---------- Uke ----------
   function renderWeek() {
-    renderStreak();
+    renderStats();
     const t = today();
     const week = B.buildWeek(currentWeek, state, t);
     const end = B.addDays(currentWeek, 6);
@@ -223,21 +229,23 @@
     }
 
     const modeClass = { "Rolig uke": "calm", "Eksamensperiode": "mid", "Innspurt": "high" }[week.mode];
+    const pct = week.totalStudy ? Math.min(100, Math.round((doneStudy / week.totalStudy) * 100)) : 0;
     $("week-summary").innerHTML = `
-      <span class="badge ${modeClass}">${week.mode}</span>
+      <div class="summary-head">
+        <span class="badge ${modeClass}">${week.mode}</span>
+        <span class="muted small">${pct} % lest</span>
+      </div>
       <div class="stats">
-        <div><span class="dot study"></span><strong>${fmtMinutes(week.totalStudy)}</strong><small>lesing</small></div>
-        <div><span class="dot train"></span><strong>${fmtMinutes(totalTraining)}</strong><small>trening</small></div>
-        <div><strong>${doneSessions}/${plannedSessions}</strong><small>økter gjort</small></div>
+        <div><small><span class="dot study"></span>Lesing</small><strong>${fmtMinutes(week.totalStudy)}</strong></div>
+        <div><small><span class="dot train"></span>Trening</small><strong>${fmtMinutes(totalTraining)}</strong></div>
+        <div><small>Økter</small><strong>${doneSessions}/${plannedSessions}</strong></div>
       </div>
-      <div class="progress" aria-label="Lesetid fullført">
-        <span style="width:${week.totalStudy ? Math.min(100, Math.round((doneStudy / week.totalStudy) * 100)) : 0}%"></span>
-      </div>
+      <div class="progress" aria-label="Lesetid fullført"><span style="width:${pct}%"></span></div>
       <small class="muted">${fmtMinutes(doneStudy)} av ${fmtMinutes(week.totalStudy)} lest med timer</small>`;
 
     const showPrompt = t >= currentWeek && t <= end && !state.logs[t];
     $("log-prompt").innerHTML = showPrompt
-      ? `<button class="card prompt" data-go="log">Hvordan sov du i natt, og hvor stresset er du? <strong>Logg nå ›</strong></button>`
+      ? `<button class="card prompt" data-go="log"><span>Hvordan sov du i natt?</span><span class="prompt-go">Logg ${icon("chevronRight")}</span></button>`
       : "";
 
     $("days").innerHTML = week.days.map((day) => renderDay(day, t)).join("");
@@ -254,16 +262,16 @@
 
     // Lesing – fylles bare av ekte timer-tid
     const readMin = G.studyMinutes(state, day.key);
-    const plants = state.sessions.filter((s) => s.day === day.key).map((s) => G.plantInfo(s.plant).icon).join("");
+    const plants = state.sessions.filter((s) => s.day === day.key).map((s) => art(s.plant, "mini")).join("");
     const studyDone = day.study > 0 && readMin >= day.study;
     let action = "";
-    if (isToday) action = `<button class="start-btn" data-open-focus>▶ Les nå</button>`;
-    else if (studyDone) action = `<span class="check-badge">✓</span>`;
+    if (isToday) action = `<button class="start-btn" data-open-focus>${icon("play")}Les</button>`;
+    else if (studyDone) action = `<span class="check-badge">${icon("check")}</span>`;
     const study = day.study > 0
       ? `<div class="task study-task ${studyDone ? "complete" : ""}">
            <span class="dot study"></span>
            <span class="task-text"><strong>Les ${fmtMinutes(day.study)}</strong>
-             <small>${readMin ? `${fmtMinutes(readMin)} lest ${plants}` : past ? `Ingen økter ${plants}` : "Ikke startet ennå"}</small>
+             <small>${readMin ? `${fmtMinutes(readMin)} lest` : past ? "Ingen økter" : "Ikke startet"}${plants ? `<span class="minis">${plants}</span>` : ""}</small>
              <span class="mini-progress"><span style="width:${Math.min(100, Math.round((readMin / day.study) * 100))}%"></span></span>
            </span>
            ${action}
@@ -277,12 +285,12 @@
            <input type="checkbox" data-day="${day.key}" data-kind="training" aria-label="Trening gjort" ${done.training ? "checked" : ""}>
            <span class="dot train"></span>
            <span class="task-text"><strong>${tr.label}</strong> · ${escapeHtml(tr.activity)}
-             <small>${tr.minutes} min · gir 💧</small>
+             <small>${tr.minutes} min · gir vann til hagen</small>
              ${swapSelect(day)}</span>
          </div>`
       : `<div class="task rest"><span class="dot rest"></span><span class="task-text">Hviledag ${swapSelect(day)}</span></div>`;
 
-    const tip = day.sleepTip ? `<p class="tip">${day.sleepTip}</p>` : "";
+    const tip = day.sleepTip ? `<p class="tip">${icon("moon")}<span>${day.sleepTip}</span></p>` : "";
     const reasons = day.reasons.slice();
     if (tr && tr.custom) reasons.push("Du har valgt denne økta selv.");
     const why = reasons.length
@@ -322,7 +330,7 @@
     const key = el.dataset.day;
     state.done[key] = Object.assign({}, state.done[key], { training: el.checked });
     let msg = null;
-    if (el.checked) msg = G.giveWater(state, key) ? "💧 +1 vann til hagen! Bruk det til å få en plante til å blomstre." : "Bra jobba! 💪";
+    if (el.checked) msg = G.giveWater(state, key) ? "+1 vann til hagen. Bruk det til å få en plante til å blomstre." : "Bra jobba!";
     save();
     renderWeek();
     if (msg) toast(msg);
@@ -378,13 +386,13 @@
     if (state.active) return showRun();
     $("seed-list").innerHTML = G.PLANTS.map((p) => `
       <button type="button" class="seed ${p.id === selectedPlant ? "on" : ""}" data-plant="${p.id}">
-        <span class="seed-ico">${p.icon}</span>
+        ${art(p.id, "seed-art")}
         <strong>${p.name}</strong>
         <small>${p.minutes} min</small>
       </button>`).join("");
     const exams = examTomorrow();
     $("exam-banner").innerHTML = exams.length
-      ? `<p class="tip">🏵️ Eksamen i morgen! Fullfør en økt i dag og få en Eksamensblomst for ${exams.map((x) => escapeHtml(x.subject)).join(" og ")}.</p>`
+      ? `<p class="tip">${art("eksamen", "mini")}<span>Eksamen i morgen. Fullfør en økt i dag og få en eksamensblomst for ${exams.map((x) => escapeHtml(x.subject)).join(" og ")}.</span></p>`
       : "";
     $("golden-wrap").hidden = state.inventory.gjodsel <= 0;
     $("use-golden").checked = false;
@@ -409,10 +417,14 @@
     showRun();
   });
 
+  let lastStage = null;
   function showRun() {
     showFocusPart("focus-run");
     const plant = G.plantInfo(state.active.plant);
-    $("focus-label").textContent = `${state.active.golden ? "Gyllen " : ""}${plant.name} gror mens du leser…`;
+    $("focus-label").textContent = state.active.golden
+      ? `Gyllen ${plant.name.toLowerCase()} gror mens du leser`
+      : `${plant.name} gror mens du leser`;
+    lastStage = null;
     clearInterval(tickTimer);
     tick();
     tickTimer = setInterval(tick, 1000);
@@ -431,12 +443,18 @@
     $("countdown").textContent = `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
     $("ring-fg").style.strokeDasharray = `${RING}`;
     $("ring-fg").style.strokeDashoffset = `${RING * (1 - p)}`;
-    const plant = G.plantInfo(a.plant);
-    const stage = p < 0.2 ? "🌰" : p < 0.5 ? "🌱" : p < 0.85 ? "🌿" : plant.icon;
+    const stage = p < 0.2 ? "seed" : p < 0.5 ? "spire" : p < 0.85 ? "ung" : a.plant;
     const grow = $("grow-plant");
-    grow.textContent = stage;
-    grow.style.transform = `scale(${0.6 + 0.4 * p})`;
+    if (stage !== lastStage) {
+      grow.innerHTML = art(stage);
+      lastStage = stage;
+    }
+    grow.style.transform = `scale(${0.7 + 0.3 * p})`;
     grow.classList.toggle("golden", !!a.golden);
+  }
+
+  function rewardLine(graphic, text) {
+    return `<li><span class="reward-ico">${graphic}</span><span>${text}</span></li>`;
   }
 
   function finish() {
@@ -452,21 +470,21 @@
     const day = B.toKey(new Date(a.start));
     const planned = B.buildWeek(B.weekStart(day), state, today()).days.find((d) => d.key === day);
     const lines = events.map((ev) => {
-      if (ev.type === "plant") return `${ev.plant.icon} ${ev.golden ? "Gyllen " : ""}${ev.plant.name} er plantet i hagen`;
-      if (ev.type === "exam") return `🏵️ Eksamensblomst for ${escapeHtml(ev.subject)} – lykke til i morgen!`;
-      if (ev.type === "gjodsel") return "🌾 Gjødsel! Tre økter i dag – neste plante kan bli gyllen";
-      if (ev.type === "frys") return `🧊 Streak-frys! ${ev.streak} dager på rad – den redder streaken en dag du ikke rekker å lese`;
-      if (ev.type === "decor") return `${ev.decor.icon} Ny pynt: ${ev.decor.name} – plasser den i hagen`;
+      if (ev.type === "plant") return rewardLine(art(ev.plant.id), `${ev.golden ? "Gyllen " : ""}${ev.plant.name} er plantet i hagen`);
+      if (ev.type === "exam") return rewardLine(art("eksamen"), `Eksamensblomst for ${escapeHtml(ev.subject)}. Lykke til i morgen!`);
+      if (ev.type === "gjodsel") return rewardLine(icon("sparkles"), "Gjødsel: tre økter i dag. Neste plante kan bli gyllen.");
+      if (ev.type === "frys") return rewardLine(icon("snowflake"), `Streak-frys: ${ev.streak} dager på rad. Den redder streaken en dag du ikke rekker å lese.`);
+      if (ev.type === "decor") return rewardLine(art(ev.decor.id), `Ny pynt: ${ev.decor.name}. Plasser den i hagen.`);
       return "";
     });
-    if (planned && planned.study) lines.push(`📚 ${fmtMinutes(G.studyMinutes(state, day))} av ${fmtMinutes(planned.study)} lest i dag`);
+    if (planned && planned.study) lines.push(rewardLine(icon("book"), `${fmtMinutes(G.studyMinutes(state, day))} av ${fmtMinutes(planned.study)} lest i dag`));
 
-    $("done-icon").textContent = events[0].plant.icon;
+    $("done-icon").innerHTML = art(events[0].plant.id);
     $("done-icon").classList.toggle("golden", !!events[0].golden);
-    $("done-title").textContent = `${a.minutes} minutter i strekk – sterkt!`;
-    $("done-rewards").innerHTML = lines.map((l) => `<li>${l}</li>`).join("");
+    $("done-title").textContent = `${a.minutes} minutter i strekk`;
+    $("done-rewards").innerHTML = lines.join("");
     showFocusPart("focus-done");
-    confetti(events.length > 1 ? 80 : 50);
+    confetti(events.length > 1 ? 60 : 40);
   }
 
   function wither(reason) {
@@ -477,10 +495,11 @@
     save();
     releaseAwake();
     renderAll();
-    $("done-icon").textContent = "🥀";
+    $("done-icon").innerHTML = art("visnet");
     $("done-icon").classList.remove("golden");
     $("done-title").textContent = "Planten visnet";
-    $("done-rewards").innerHTML = `<li>${reason}</li><li>Den visne planten blir stående i hagen. Prøv igjen – en kortere økt er også fin!</li>`;
+    $("done-rewards").innerHTML = rewardLine(icon("clock"), reason)
+      + rewardLine(icon("info"), "Den visne planten blir stående i hagen. Prøv igjen – en kortere økt er også fin.");
     showFocusPart("focus-done");
   }
 
@@ -495,7 +514,7 @@
     const result = G.resolve(a, Date.now());
     if (result === "wither") {
       const away = Math.round((Date.now() - a.leftAt) / 60000);
-      return wither(`Du var borte fra appen i ${away} min (grensen er 2 min).`);
+      return wither(`Du var borte fra appen i ${away} min. Grensen er 2 min.`);
     }
     const wasAway = !!a.leftAt;
     delete a.leftAt;
@@ -503,7 +522,7 @@
     if (result === "complete") return finish();
     showRun();
     keepAwake();
-    if (wasAway && !isStartup) toast("Velkommen tilbake! Planten lever fortsatt 🌱");
+    if (wasAway && !isStartup) toast("Velkommen tilbake. Planten lever fortsatt.");
   }
 
   document.addEventListener("visibilitychange", () => {
@@ -531,64 +550,66 @@
 
   function renderGarden() {
     const t = today();
-    const w = G.weather(state, t);
-    $("sky").className = `sky sky-${w}`;
-    $("weather-icon").textContent = WEATHER[w].icon;
-    $("weather-text").textContent = WEATHER[w].text;
+    const wKey = G.weather(state, t);
+    $("weather-pill").innerHTML = `<span class="w-${wKey}">${icon(WEATHER[wKey].icon)}</span>${WEATHER[wKey].short}`;
+    $("weather-text").textContent = WEATHER[wKey].text;
 
     const start = B.weekStart(t);
     const week = state.sessions.filter((s) => s.day >= start && s.day <= B.addDays(start, 6));
     const grown = week.filter((s) => s.status === "grown" && s.minutes > 0);
     const withered = week.filter((s) => s.status === "withered").length;
     $("garden-stats").innerHTML = `
-      <span><strong>${grown.length}</strong> planter denne uka</span>
-      <span><strong>${fmtMinutes(grown.reduce((x, s) => x + s.minutes, 0))}</strong> lest</span>
-      <span><strong>${withered}</strong> visnet</span>`;
+      <div><strong>${grown.length}</strong><small>planter denne uka</small></div>
+      <div><strong>${fmtMinutes(grown.reduce((x, s) => x + s.minutes, 0))}</strong><small>lest</small></div>
+      <div><strong>${withered}</strong><small>visnet</small></div>`;
 
     const byId = Object.fromEntries(state.sessions.map((s) => [s.id, s]));
     $("garden-grid").innerHTML = state.garden.tiles.map((tile, i) => {
       if (!tile) return `<button class="tile empty ${placing ? "target" : ""}" data-tile="${i}" aria-label="Ledig rute"></button>`;
       if (tile.kind === "decor") {
         const d = G.DECOR.find((x) => x.id === tile.id);
-        return `<button class="tile decor" data-tile="${i}" aria-label="${d.name}">${d.icon}</button>`;
+        return `<button class="tile decor" data-tile="${i}" aria-label="${d.name}">${art(d.id)}</button>`;
       }
       const s = byId[tile.sid];
       if (!s) return `<button class="tile empty" data-tile="${i}"></button>`;
       const info = G.plantInfo(s.plant);
       const cls = s.status === "withered" ? "withered" : s.bloomed ? "bloomed" : "thirsty";
-      return `<button class="tile plant ${cls} ${s.golden ? "golden" : ""}" data-tile="${i}" aria-label="${info.name}">${info.icon}</button>`;
+      return `<button class="tile plant ${cls} ${s.golden ? "golden" : ""}" data-tile="${i}" aria-label="${info.name}">${art(s.plant)}</button>`;
     }).join("");
 
     const hint = $("place-hint");
     if (placing) {
       const d = G.DECOR.find((x) => x.id === placing);
       hint.hidden = false;
-      hint.innerHTML = `Trykk på en ledig rute for å plassere ${d.icon} ${d.name} <button class="ghost small-btn" id="cancel-place">Avbryt</button>`;
+      hint.innerHTML = `<span>Velg en ledig rute for ${d.name.toLowerCase()}</span><button class="ghost small-btn" id="cancel-place">Avbryt</button>`;
     } else {
       hint.hidden = true;
     }
 
     const thirsty = state.sessions.filter((s) => s.status === "grown" && !s.bloomed).length;
     $("inventory").innerHTML = `
-      <div class="inv"><span class="inv-ico">💧</span><strong>${state.inventory.vann}</strong><small>Vann – fås når du trener. Trykk på en plante for å få den til å blomstre${thirsty ? ` (${thirsty} venter)` : ""}.</small></div>
-      <div class="inv"><span class="inv-ico">🌾</span><strong>${state.inventory.gjodsel}</strong><small>Gjødsel – fås etter 3 økter på én dag. Gir en gyllen plante.</small></div>
-      <div class="inv"><span class="inv-ico">🧊</span><strong>${state.inventory.frys}</strong><small>Streak-frys – fås for hver 7. dag på rad. Brukes automatisk hvis du glemmer en dag.</small></div>`;
+      <div class="inv"><span class="inv-ico water">${icon("droplet")}</span><strong>${state.inventory.vann}</strong>
+        <span class="inv-text"><b>Vann</b><small>Fås når du trener. Trykk på en plante for å få den til å blomstre${thirsty ? ` (${thirsty} venter)` : ""}.</small></span></div>
+      <div class="inv"><span class="inv-ico gold">${icon("sparkles")}</span><strong>${state.inventory.gjodsel}</strong>
+        <span class="inv-text"><b>Gjødsel</b><small>Fås etter 3 økter på én dag. Gjør neste plante gyllen.</small></span></div>
+      <div class="inv"><span class="inv-ico ice">${icon("snowflake")}</span><strong>${state.inventory.frys}</strong>
+        <span class="inv-text"><b>Streak-frys</b><small>Fås for hver 7. dag på rad. Brukes automatisk hvis du glemmer en dag.</small></span></div>`;
 
     const total = G.totalMinutes(state);
     $("decor-list").innerHTML = G.decorStatus(state).map((d) => `
       <div class="decor-item ${d.unlocked ? "" : "locked"}">
-        <span class="inv-ico">${d.icon}</span>
+        <span class="decor-art">${art(d.id)}</span>
         <span class="decor-text"><strong>${d.name}</strong>
-          <small>${d.unlocked ? (d.placed ? "I hagen" : "Klar til å plasseres") : `Les ${Math.round(d.minutes / 60)} t totalt (${(total / 60).toFixed(1).replace(".", ",")} t nå)`}</small></span>
+          <small>${d.unlocked ? (d.placed ? "I hagen" : "Klar til å plasseres") : `Les ${Math.round(d.minutes / 60)} t totalt · ${(total / 60).toFixed(1).replace(".", ",")} t nå`}</small></span>
         ${d.unlocked && !d.placed ? `<button class="small-btn" data-place="${d.id}">Plasser</button>` : ""}
       </div>`).join("");
 
     $("catalog").innerHTML = G.catalog(state).map((p) => {
-      const how = p.id === "eksamen" ? "Fullfør en økt dagen før en eksamen" : `Les ${p.minutes} min i strekk`;
-      return `<div class="medal ${p.count ? "earned" : "locked"}">
-        <span class="ico">${p.icon}</span>
+      const how = p.id === "eksamen" ? "Økt dagen før en eksamen" : `${p.minutes} min i strekk`;
+      return `<div class="cat ${p.count ? "earned" : "locked"}">
+        ${art(p.id)}
         <strong>${p.name}</strong>
-        <small>${p.count ? `× ${p.count}${p.golden ? ` · ✨ ${p.golden} gyllen` : ""}` : how}</small>
+        <small>${p.count ? `× ${p.count}${p.golden ? ` · ${p.golden} gyllen` : ""}` : how}</small>
       </div>`;
     }).join("");
   }
@@ -615,14 +636,14 @@
         placing = null;
         save();
         renderGarden();
-        toast("Pynten er plassert! 🎉");
+        toast("Pynten er plassert.");
       }
       return;
     }
     if (!tile) return;
     if (tile.kind === "decor") {
       const d = G.DECOR.find((x) => x.id === tile.id);
-      if (confirm(`Flytte ${d.name} tilbake til lageret?`)) {
+      if (confirm(`Flytte ${d.name.toLowerCase()} tilbake til lageret?`)) {
         G.removeDecor(state, index);
         save();
         renderGarden();
@@ -631,19 +652,19 @@
     }
     const s = state.sessions.find((x) => x.id === tile.sid);
     const info = G.plantInfo(s.plant);
-    if (s.status === "withered") return toast(`🥀 Visnet ${fmtDate(s.day)} – økta ble ikke fullført`);
+    if (s.status === "withered") return toast(`Visnet ${fmtDate(s.day)} – økta ble ikke fullført`);
     if (!s.bloomed) {
       if (G.waterPlant(state, s.id)) {
         save();
         renderGarden();
-        toast(`${info.icon} ${info.name} blomstrer! 💧`);
-        confetti(25);
+        toast(`${info.name} blomstrer`);
+        confetti(20);
       } else {
-        toast("Planten er tørst – tren for å få vann 💧");
+        toast("Planten er tørst. Tren for å få vann.");
       }
       return;
     }
-    toast(`${info.icon} ${s.golden ? "Gyllen " : ""}${info.name}${s.subject ? ` for ${s.subject}` : ""} · ${fmtDate(s.day)}${s.minutes ? ` · ${s.minutes} min` : ""}`);
+    toast(`${s.golden ? "Gyllen " : ""}${info.name}${s.subject ? ` for ${s.subject}` : ""} · ${fmtDate(s.day)}${s.minutes ? ` · ${s.minutes} min` : ""}`);
   });
 
   // ---------- Logg ----------
@@ -700,7 +721,7 @@
     save();
     renderLog();
     const readiness = B.readinessFor(today(), state.logs, today());
-    let msg = `Lagret. Været i hagen: ${WEATHER[G.weather(state, today())].icon}`;
+    let msg = `Lagret. Været i hagen: ${WEATHER[G.weather(state, today())].short.toLowerCase()}.`;
     if (readiness && readiness.value < 0.4) msg += " Du virker sliten – planen er justert med lettere trening og kortere leseøkter.";
     else if (readiness && readiness.value > 0.75) msg += " Du har godt overskudd – planen kjører som normalt.";
     $("log-feedback").textContent = msg;
@@ -716,11 +737,12 @@
     }
     $("exam-list").innerHTML = exams.map((exam) => {
       const days = B.daysBetween(t, exam.date);
-      const when = days < 0 ? "Ferdig" : days === 0 ? "I dag!" : days === 1 ? "I morgen" : `Om ${days} dager`;
+      const when = days < 0 ? "Ferdig" : days === 0 ? "I dag" : days === 1 ? "I morgen" : `Om ${days} dager`;
       return `<li class="card exam-item ${days < 0 ? "past" : ""}">
-        <div><strong>${escapeHtml(exam.subject)}</strong><small class="muted">${fmtDate(exam.date)}${state.examFlowers[exam.id] ? " · 🏵️" : ""}</small></div>
+        <div><strong>${escapeHtml(exam.subject)}</strong><small class="muted">${fmtDate(exam.date)}</small></div>
+        ${state.examFlowers[exam.id] ? art("eksamen", "mini") : ""}
         <span class="chip ${days >= 0 && days <= 7 ? "exam" : ""}">${when}</span>
-        <button class="icon-btn" data-delete="${exam.id}" aria-label="Slett ${escapeHtml(exam.subject)}">×</button>
+        <button class="icon-btn tiny" data-delete="${exam.id}" aria-label="Slett ${escapeHtml(exam.subject)}">${icon("x")}</button>
       </li>`;
     }).join("");
   }
@@ -774,15 +796,15 @@
   }
 
   function renderTemplates() {
-    const hints = { 2: "Når det er rolig – full innsats", 1: "Når eksamen nærmer seg", 0: "Innspurt eller lite søvn" };
+    const hints = { 2: "Når det er rolig", 1: "Når eksamen nærmer seg", 0: "Innspurt eller lite søvn" };
     $("templates").innerHTML = [2, 1, 0].map((lvl) => `
       <div class="tpl-group">
         <h3>${B.ACTIVITIES[lvl].label} <span class="muted small">${hints[lvl]}</span></h3>
         <ul class="tpl-list">
-          ${state.templates[lvl].map((t, i) => `<li><span>${escapeHtml(t)}</span><button type="button" class="icon-btn tiny" data-tpl-del="${lvl}:${i}" aria-label="Slett">×</button></li>`).join("")}
+          ${state.templates[lvl].map((t, i) => `<li><span>${escapeHtml(t)}</span><button type="button" class="icon-btn tiny" data-tpl-del="${lvl}:${i}" aria-label="Slett">${icon("x")}</button></li>`).join("")}
         </ul>
         <form class="tpl-add" data-tpl-add="${lvl}">
-          <input type="text" maxlength="80" placeholder="Ny økt, f.eks. «Bein: 4 × 10 knebøy»" aria-label="Ny ${B.ACTIVITIES[lvl].label.toLowerCase()} økt">
+          <input type="text" maxlength="80" placeholder="Ny økt" aria-label="Ny ${B.ACTIVITIES[lvl].label.toLowerCase()} økt">
           <button type="submit" class="small-btn">Legg til</button>
         </form>
       </div>`).join("");
@@ -889,7 +911,7 @@
   const frozen = G.applyFreezes(state, today());
   save();
   renderAll();
-  if (frozen.length) toast(`🧊 Streak-frys brukt for ${frozen.map(fmtDate).join(", ")} – streaken lever!`);
+  if (frozen.length) toast(`Streak-frys brukt for ${frozen.map(fmtDate).join(", ")}. Streaken lever.`);
   if (state.active) checkReturn(true);
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {

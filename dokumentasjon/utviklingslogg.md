@@ -6,7 +6,8 @@ For hver versjon står det hva jeg ba om, hva KI-en gjorde, hvordan appen ble te
 Alle versjonene finnes i koden:
 - **Versjon 1** ligger urørt i mappen [`versjon-1/`](../versjon-1/) og i git-taggen `v1`.
 - **Versjon 2** ligger urørt i mappen [`versjon-2/`](../versjon-2/) og i git-taggen `v2`.
-- **Versjon 3** er hovedappen i rotmappen (git-taggen `v3`).
+- **Versjon 3** ligger urørt i mappen [`versjon-3/`](../versjon-3/) og i git-taggen `v3`.
+- **Versjon 4** er hovedappen i rotmappen (git-taggen `v4`).
 
 ---
 
@@ -151,6 +152,53 @@ og spørsmålet om hvor streng appen skal være når man går ut av den. Så val
 | Planten visnet | Hagen (regnvær) | Lager og pynt | Mine treningsøkter |
 |---|---|---|---|
 | ![Visnet](skjermbilder/versjon-3/5-planten-visnet.jpg) | ![Hagen](skjermbilder/versjon-3/6-hagen.jpg) | ![Lager](skjermbilder/versjon-3/7-lager-og-pynt.jpg) | ![Økter](skjermbilder/versjon-3/8-mine-treningsokter.jpg) |
+
+---
+
+## Versjon 4 – minimalt og moderne design
+
+### Tilbakemelding etter å ha prøvd versjon 3 (min prompt)
+
+Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
+
+> liker ikke dette . dn svære fire greia. gjør appen mer minimal og mer modenrne. fiks emojiene.
+
+### Hva KI-en gjorde
+
+- **Det store flammekortet er borte.** Øverst er det nå en rolig rad med tre små nøkkeltall:
+  dager på rad, planter denne uka og været i hagen, pluss én kort setning under.
+- **Ingen emojier.** Emojier ser forskjellige ut på hver telefon, og på Windows ble de tykke og barnslige.
+  Alt er erstattet med egne tegninger i `icons.js`:
+  - strektegnede ikoner til menyen, knapper, lager og vær (flamme, spire, dråpe, snøfnugg, sol, sky og regn)
+  - flate, enkle illustrasjoner av alle plantene (frø, spire, tulipan, solsikke, tre, kirsebærtre, eksamensblomst og visnet plante)
+    og av pynten (benk, lykt, sommerfugler, dam, fontene, sopp og hagestue)
+- **Mer moderne uttrykk:** skrifttypen Inter, en liten overskrift i store bokstaver over tittelen, roligere farger,
+  mykere skygger, smalere fremdriftslinjer, runde «Les»-knapper og en fanemeny med uskarp bakgrunn.
+- **Hagen** har lyse, nøytrale ruter i stedet for brun jord. Tørste planter vises grå til de blir vannet.
+  Den store himmelen med regnanimasjon er byttet ut med en liten værmerkelapp.
+- Versjon 3 ble tatt vare på i `versjon-3/`.
+
+### Testing og forbedringer
+
+- Alle **17 automatiske tester** består fortsatt, siden logikken ikke er endret.
+- Et søk etter emojier i koden ga ingen treff.
+- Testet i mobilstørrelse: ukeplanen, frøvelgeren, timeren, fullført økt, en økt der jeg ga opp, hagen, pynt, katalog og treningsøkter.
+- **Feil funnet under testing og rettet:**
+  - Plantetegningen inni timeren var rotert 90 grader. CSS-regelen som roterer fremdriftsringen traff også planten.
+    Den gjelder nå bare selve ringen.
+  - Nøkkeltallene ble delt over to linjer («7 dager / på rad»). Nå står tallet øverst og teksten under.
+  - En kort inntoning når man byttet fane gjorde at skjermbildene ble blasse. Den ble fjernet, som passer med et mer minimalt design.
+  - Teksten under timeren begynte med liten bokstav («solsikke gror…»).
+
+### Skjermbilder – versjon 4
+
+| Uke | I dag | Velg plante | Timer |
+|---|---|---|---|
+| ![Uke](skjermbilder/versjon-4/1-uke.jpg) | ![I dag](skjermbilder/versjon-4/2-i-dag.jpg) | ![Velg](skjermbilder/versjon-4/3-velg-plante.jpg) | ![Timer](skjermbilder/versjon-4/4-timer.jpg) |
+
+| Økt fullført | Hagen | Pynt og frøkatalog | Treningsøkter |
+|---|---|---|---|
+| ![Fullført](skjermbilder/versjon-4/5-okt-fullfort.jpg) | ![Hagen](skjermbilder/versjon-4/6-hagen.jpg) | ![Pynt](skjermbilder/versjon-4/7-pynt-og-katalog.jpg) | ![Økter](skjermbilder/versjon-4/8-treningsokter.jpg) |
 
 ---
 

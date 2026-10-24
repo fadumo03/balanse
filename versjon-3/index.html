@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Balanse</title>
+  <meta name="description" content="Ukeplan som balanserer lesing og trening ut fra eksamener, søvn og stress.">
+  <meta name="theme-color" content="#f7faf8">
+  <script>
+    // Sett valgt tema før siden tegnes, så det ikke blinker.
+    try {
+      var saved = JSON.parse(localStorage.getItem("balanse-v1") || "{}");
+      if (saved.settings && saved.settings.theme && saved.settings.theme !== "mint") document.documentElement.dataset.theme = saved.settings.theme;
+    } catch (e) {}
+  </script>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Balanse">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <!-- UKE -->
+    <section id="view-week" class="view active" aria-label="Ukeplan">
+      <header class="top">
+        <button class="icon-btn" id="prev-week" aria-label="Forrige uke">‹</button>
+        <div class="top-title">
+          <h1 id="week-title">Uke</h1>
+          <p id="week-range" class="muted"></p>
+        </div>
+        <button class="icon-btn" id="next-week" aria-label="Neste uke">›</button>
+      </header>
+      <div id="streak-card"></div>
+      <div id="week-summary" class="card summary"></div>
+      <div id="log-prompt"></div>
+      <div id="days"></div>
+    </section>
+
+    <!-- LOGG -->
+    <section id="view-log" class="view" aria-label="Søvn og stress">
+      <header class="top"><div class="top-title"><h1>Søvn og stress</h1>
+        <p class="muted">Planen og været i hagen justeres etter hvordan du har det</p></div></header>
+      <form id="log-form" class="card">
+        <label class="field">Dato
+          <input type="date" id="log-date" required>
+        </label>
+        <label class="field">Søvn i natt: <strong id="sleep-out">7,5 t</strong>
+          <input type="range" id="log-sleep" min="3" max="12" step="0.5" value="7.5">
+        </label>
+        <fieldset class="field">
+          <legend>Stressnivå</legend>
+          <div class="segmented" id="stress-group">
+            <button type="button" data-v="1">1<small>Rolig</small></button>
+            <button type="button" data-v="2">2</button>
+            <button type="button" data-v="3" class="on">3</button>
+            <button type="button" data-v="4">4</button>
+            <button type="button" data-v="5">5<small>Mye</small></button>
+          </div>
+        </fieldset>
+        <button type="submit" class="primary">Lagre</button>
+        <p id="log-feedback" class="feedback" role="status"></p>
+      </form>
+      <div class="card">
+        <h2>Siste 14 dager</h2>
+        <div id="log-chart" class="chart"></div>
+        <p class="muted small"><span class="key sleep"></span> søvn (timer) &nbsp; <span class="key stress"></span> stress (1–5)</p>
+      </div>
+    </section>
+
+    <!-- HAGE -->
+    <section id="view-garden" class="view" aria-label="Hagen din">
+      <div id="sky" class="sky">
+        <div class="sky-text">
+          <h1>Hagen din</h1>
+          <p id="weather-text"></p>
+        </div>
+        <span id="weather-icon" class="weather-icon"></span>
+        <div class="rain-drops" aria-hidden="true"></div>
+      </div>
+      <div id="garden-stats" class="garden-stats"></div>
+      <div id="place-hint" class="place-hint" hidden></div>
+      <div id="garden-grid" class="garden-grid"></div>
+      <button class="primary start-big" data-open-focus>▶ Start leseøkt</button>
+
+      <div class="card">
+        <h2>Lager</h2>
+        <div id="inventory" class="inventory"></div>
+      </div>
+      <div class="card">
+        <h2>Pynt</h2>
+        <p class="muted small">Låses opp etter hvor mange timer du har lest. Trykk «Plasser» og så på en ledig rute.</p>
+        <div id="decor-list" class="decor-list"></div>
+      </div>
+      <div class="card">
+        <h2>Frøkatalog</h2>
+        <div id="catalog" class="badge-grid"></div>
+      </div>
+    </section>
+
+    <!-- EKSAMENER -->
+    <section id="view-exams" class="view" aria-label="Eksamener">
+      <header class="top"><div class="top-title"><h1>Eksamener</h1>
+        <p class="muted">Lesetiden øker når eksamen nærmer seg</p></div></header>
+      <form id="exam-form" class="card">
+        <label class="field">Fag
+          <input type="text" id="exam-subject" placeholder="F.eks. Matematikk 1" maxlength="40" required>
+        </label>
+        <label class="field">Dato
+          <input type="date" id="exam-date" required>
+        </label>
+        <button type="submit" class="primary">Legg til eksamen</button>
+      </form>
+      <ul id="exam-list" class="list"></ul>
+    </section>
+
+    <!-- MÅL -->
+    <section id="view-goals" class="view" aria-label="Mål">
+      <header class="top"><div class="top-title"><h1>Mål</h1>
+        <p class="muted">Utgangspunktet for en vanlig, rolig uke</p></div></header>
+      <form id="goals-form" class="card">
+        <label class="field">Treningsøkter per uke: <strong id="sessions-out">4</strong>
+          <input type="range" id="goal-sessions" min="1" max="7" step="1">
+        </label>
+        <label class="field">Minutter per økt: <strong id="minutes-out">45</strong>
+          <input type="range" id="goal-minutes" min="20" max="120" step="5">
+        </label>
+        <label class="field">Lesetid per dag i rolige uker: <strong id="study-base-out">1 t 30 min</strong>
+          <input type="range" id="goal-study-base" min="30" max="240" step="15">
+        </label>
+        <label class="field">Maks lesetid rett før eksamen: <strong id="study-max-out">5 t</strong>
+          <input type="range" id="goal-study-max" min="120" max="480" step="15">
+        </label>
+        <p class="muted small">Endringer lagres automatisk.</p>
+      </form>
+      <div class="card">
+        <h2>Mine treningsøkter</h2>
+        <p class="muted small">Appen velger fra listene dine hver dag, så du slipper å bestemme deg. Du kan alltid bytte økt på en dag i ukeplanen.</p>
+        <div id="templates"></div>
+      </div>
+      <div class="card">
+        <h2>Tema</h2>
+        <div id="theme-picker" class="themes"></div>
+      </div>
+      <div class="card">
+        <h2>Data</h2>
+        <p class="muted small">Alt lagres bare på denne enheten.</p>
+        <div class="row-buttons">
+          <button type="button" id="demo-data">Last inn eksempeldata</button>
+          <button type="button" id="reset-data" class="danger">Slett alt</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Hovedmeny">
+    <button data-view="week" class="on"><span class="tab-ico">▦</span>Uke</button>
+    <button data-view="log"><span class="tab-ico">☾</span>Logg</button>
+    <button data-view="garden"><span class="tab-ico">✿</span>Hage</button>
+    <button data-view="exams"><span class="tab-ico">✎</span>Eksamener</button>
+    <button data-view="goals"><span class="tab-ico">◎</span>Mål</button>
+  </nav>
+
+  <!-- FOKUS-TIMER -->
+  <div id="focus" class="focus" hidden>
+    <div class="focus-inner">
+      <div id="focus-pick">
+        <button class="icon-btn focus-close" data-close-focus aria-label="Lukk">×</button>
+        <h2>Hva vil du plante?</h2>
+        <p class="muted">Lengre økt i strekk gir en finere plante.</p>
+        <div id="seed-list" class="seed-list"></div>
+        <div id="exam-banner"></div>
+        <label id="golden-wrap" class="golden-toggle" hidden>
+          <input type="checkbox" id="use-golden">
+          <span>Bruk 🌾 gjødsel – gir en gyllen plante ✨ <small id="gjodsel-count" class="muted"></small></span>
+        </label>
+        <button class="primary" id="start-focus">Start</button>
+        <p class="muted small center">Skjermen holdes på mens du leser. Du kan gå ut av appen i inntil 2 minutter – er du borte lenger, visner planten.</p>
+      </div>
+
+      <div id="focus-run" hidden>
+        <div class="ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+            <circle id="ring-fg" class="ring-fg" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <span id="grow-plant" class="grow"></span>
+        </div>
+        <div id="countdown" class="countdown" role="timer">45:00</div>
+        <p id="focus-label" class="muted center"></p>
+        <button id="give-up" class="ghost">Gi opp</button>
+      </div>
+
+      <div id="focus-done" hidden>
+        <div id="done-icon" class="done-icon"></div>
+        <h2 id="done-title" class="center"></h2>
+        <ul id="done-rewards" class="reward-list"></ul>
+        <button class="primary" id="to-garden">Se hagen</button>
+        <button id="close-done" class="ghost">Lukk</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script src="plan.js"></script>
+  <script src="garden.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

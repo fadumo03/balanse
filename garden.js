@@ -10,25 +10,26 @@
   const MIN_TILES = 30;
   const COLS = 5;
 
+  // Illustrasjonene ligger i icons.js og slås opp på id.
   const PLANTS = [
-    { id: "spire", icon: "🌱", name: "Spire", minutes: 25 },
-    { id: "tulipan", icon: "🌷", name: "Tulipan", minutes: 45 },
-    { id: "solsikke", icon: "🌻", name: "Solsikke", minutes: 45 },
-    { id: "tre", icon: "🌳", name: "Tre", minutes: 60 },
-    { id: "kirsebaer", icon: "🌸", name: "Kirsebærtre", minutes: 90 }
+    { id: "spire", name: "Spire", minutes: 25 },
+    { id: "tulipan", name: "Tulipan", minutes: 45 },
+    { id: "solsikke", name: "Solsikke", minutes: 45 },
+    { id: "tre", name: "Tre", minutes: 60 },
+    { id: "kirsebaer", name: "Kirsebærtre", minutes: 90 }
   ];
-  const EXAM_FLOWER = { id: "eksamen", icon: "🏵️", name: "Eksamensblomst" };
-  const WITHERED = { id: "visnet", icon: "🥀", name: "Visnet plante" };
+  const EXAM_FLOWER = { id: "eksamen", name: "Eksamensblomst" };
+  const WITHERED = { id: "visnet", name: "Visnet plante" };
 
   // Pynt låses opp etter totalt antall minutter lest med timer.
   const DECOR = [
-    { id: "benk", icon: "🪑", name: "Benk", minutes: 300 },
-    { id: "lykt", icon: "🏮", name: "Lykt", minutes: 600 },
-    { id: "sommerfugl", icon: "🦋", name: "Sommerfugler", minutes: 900 },
-    { id: "dam", icon: "🐸", name: "Froskedam", minutes: 1200 },
-    { id: "fontene", icon: "⛲", name: "Fontene", minutes: 1800 },
-    { id: "sopp", icon: "🍄", name: "Sopp-ring", minutes: 2400 },
-    { id: "hus", icon: "🏡", name: "Hagestue", minutes: 3000 }
+    { id: "benk", name: "Benk", minutes: 300 },
+    { id: "lykt", name: "Lykt", minutes: 600 },
+    { id: "sommerfugl", name: "Sommerfugler", minutes: 900 },
+    { id: "dam", name: "Dam", minutes: 1200 },
+    { id: "fontene", name: "Fontene", minutes: 1800 },
+    { id: "sopp", name: "Sopp", minutes: 2400 },
+    { id: "hus", name: "Hagestue", minutes: 3000 }
   ];
 
   function plantInfo(id) {
