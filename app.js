@@ -3,8 +3,17 @@
   "use strict";
 
   const B = window.Balanse;
+  const R = window.Rewards;
   const STORAGE_KEY = "balanse-v1";
   const MONTHS = ["jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "des"];
+  const THEMES = [
+    { id: "mint", name: "Mint", swatch: "linear-gradient(135deg,#e0f3ec,#1f8a70)", bar: "#f7faf8" },
+    { id: "fersken", name: "Fersken", swatch: "linear-gradient(135deg,#ffe3c4,#e8664a)", bar: "#fff8f3" },
+    { id: "lavendel", name: "Lavendel", swatch: "linear-gradient(135deg,#e9e2ff,#7457d6)", bar: "#f8f6fd" },
+    { id: "hav", name: "Hav", swatch: "linear-gradient(135deg,#d9f1ff,#1f78c1)", bar: "#f4f9fd" },
+    { id: "natt", name: "Natt", swatch: "linear-gradient(135deg,#2b2540,#14171c)", bar: "#14171c" }
+  ];
+  const CONFETTI_COLORS = ["#f07c1b", "#1f8a70", "#3b6fd4", "#e8664a", "#7457d6", "#f5c518"];
 
   const $ = (id) => document.getElementById(id);
 
@@ -65,8 +74,102 @@
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
+  const studyPoints = (min) => 10 + Math.floor(min / 15);
+
+  // ---------- Streak / motivasjon ----------
+  function renderStreak() {
+    const t = today();
+    const streak = R.studyStreak(state.done, t);
+    const readToday = !!(state.done[t] && state.done[t].study);
+    const lvl = R.level(state.done);
+
+    let message;
+    if (readToday) message = streak > 1 ? "Dagens lesing er gjort – streaken er trygg! 🎉" : "Bra start! Les i morgen også for å bygge streak.";
+    else if (streak > 0) message = `Les i dag for å holde streaken på ${streak + 1} dager!`;
+    else message = "Kryss av dagens lesing for å starte en streak.";
+
+    $("streak-card").innerHTML = `
+      <button class="card hero" data-go="rewards" aria-label="Se premier">
+        <span class="flame ${streak ? "" : "cold"}">🔥</span>
+        <span class="hero-text">
+          <span class="big">${streak} ${streak === 1 ? "dag" : "dager"} på rad</span>
+          <p>${message}</p>
+        </span>
+        <span class="lvl">Nivå<strong>${lvl.level}</strong></span>
+      </button>`;
+  }
+
+  // ---------- Premier ----------
+  function renderRewards() {
+    const t = today();
+    const lvl = R.level(state.done);
+    const totals = R.totals(state.done);
+    $("level-card").innerHTML = `
+      <p class="muted small">Nivå</p>
+      <div class="lvl-num">${lvl.level}</div>
+      <p class="muted small">${lvl.points} poeng · ${lvl.toNext} poeng til nivå ${lvl.level + 1}</p>
+      <div class="progress xp"><span style="width:${Math.round(lvl.progress * 100)}%"></span></div>
+      <div class="stats3">
+        <div><strong>🔥 ${R.studyStreak(state.done, t)}</strong><small>streak nå</small></div>
+        <div><strong>${R.bestStreak(state.done)}</strong><small>beste streak</small></div>
+        <div><strong>${(totals.studyMin / 60).toFixed(1).replace(".", ",")} t</strong><small>lest totalt</small></div>
+      </div>`;
+
+    $("badge-grid").innerHTML = R.badges(state).map((b) => `
+      <div class="medal ${b.earned ? "earned" : "locked"}" title="${b.desc}">
+        <span class="ico">${b.icon}</span>
+        <strong>${b.title}</strong>
+        <small>${b.earned ? "Låst opp!" : b.desc}</small>
+      </div>`).join("");
+  }
+
+  // ---------- Feiring ----------
+  let toastTimer;
+  function toast(text) {
+    const el = $("toast");
+    el.textContent = text;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+
+  function confetti(count) {
+    const box = $("confetti");
+    box.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("i");
+      piece.style.left = `${Math.random() * 100}%`;
+      piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      piece.style.animationDelay = `${Math.random() * 0.4}s`;
+      piece.style.animationDuration = `${1 + Math.random() * 0.8}s`;
+      box.appendChild(piece);
+    }
+    setTimeout(() => { box.innerHTML = ""; }, 2400);
+  }
+
+  // ---------- Tema ----------
+  function applyTheme() {
+    const theme = THEMES.find((x) => x.id === state.settings.theme) || THEMES[0];
+    if (theme.id === "mint") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme.id;
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", theme.bar);
+    $("theme-picker").innerHTML = THEMES.map((x) => `
+      <button type="button" class="theme-btn ${x.id === theme.id ? "on" : ""}" data-theme-id="${x.id}" aria-pressed="${x.id === theme.id}">
+        <span class="sw" style="background:${x.swatch}"></span>${x.name}
+      </button>`).join("");
+  }
+
+  $("theme-picker").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-theme-id]");
+    if (!btn) return;
+    state.settings.theme = btn.dataset.themeId;
+    save();
+    applyTheme();
+  });
+
   // ---------- Uke ----------
   function renderWeek() {
+    renderStreak();
     const t = today();
     const week = B.buildWeek(currentWeek, state, t);
     const end = B.addDays(currentWeek, 6);
@@ -122,14 +225,16 @@
            <span class="dot train"></span>
            <span class="task-text"><strong>${day.training.label}</strong> · ${day.training.activity}
              <small>${day.training.minutes} min</small></span>
+           <span class="pts">+5 p</span>
          </label>`
       : `<div class="task rest"><span class="dot rest"></span><span class="task-text">Hviledag</span></div>`;
 
     const study = day.study > 0
       ? `<label class="task ${done.study ? "checked" : ""}">
-           <input type="checkbox" data-day="${day.key}" data-kind="study" ${done.study ? "checked" : ""}>
+           <input type="checkbox" data-day="${day.key}" data-kind="study" data-min="${day.study}" ${done.study ? "checked" : ""}>
            <span class="dot study"></span>
            <span class="task-text"><strong>Les</strong> <small>${fmtMinutes(day.study)}</small></span>
+           <span class="pts">+${studyPoints(day.study)} p</span>
          </label>`
       : "";
 
@@ -157,9 +262,34 @@
     const box = e.target;
     if (!box.matches("input[type=checkbox]")) return;
     const key = box.dataset.day;
-    state.done[key] = Object.assign({}, state.done[key], { [box.dataset.kind]: box.checked });
+    const before = {
+      level: R.level(state.done).level,
+      badges: new Set(R.badges(state).filter((b) => b.earned).map((b) => b.id))
+    };
+
+    const update = { [box.dataset.kind]: box.checked };
+    if (box.dataset.kind === "study") update.studyMin = box.checked ? Number(box.dataset.min) : 0;
+    state.done[key] = Object.assign({}, state.done[key], update);
     save();
     renderWeek();
+
+    if (!box.checked) return;
+    const newBadges = R.badges(state).filter((b) => b.earned && !before.badges.has(b.id));
+    const lvl = R.level(state.done);
+    const gained = box.dataset.kind === "study" ? studyPoints(Number(box.dataset.min)) : 5;
+    if (newBadges.length) {
+      toast(`${newBadges[0].icon} Nytt merke: ${newBadges[0].title}!`);
+      confetti(60);
+    } else if (lvl.level > before.level) {
+      toast(`⭐ Nivå ${lvl.level}! Sterkt jobba!`);
+      confetti(60);
+    } else if (box.dataset.kind === "study" && key === today()) {
+      const streak = R.studyStreak(state.done, key);
+      toast(`🔥 ${streak} ${streak === 1 ? "dag" : "dager"} på rad! +${gained} poeng`);
+      confetti(30);
+    } else {
+      toast(`Bra jobba! +${gained} poeng`);
+    }
   });
 
   $("prev-week").addEventListener("click", () => {
@@ -305,7 +435,7 @@
     const logs = {};
     sleep.forEach((s, i) => { logs[B.addDays(t, i - 6)] = { sleep: s, stress: stress[i] }; });
     state = {
-      settings: Object.assign({}, B.DEFAULT_SETTINGS),
+      settings: Object.assign({}, B.DEFAULT_SETTINGS, { theme: state.settings.theme }),
       exams: [
         { id: "1", subject: "Matematikk 1", date: B.addDays(t, 5) },
         { id: "2", subject: "Statistikk", date: B.addDays(t, 19) },
@@ -314,6 +444,12 @@
       logs,
       done: {}
     };
+    // De fire siste dagene er "gjort", slik at streak og merker vises i demoen.
+    for (let i = 4; i >= 1; i--) {
+      const key = B.addDays(t, -i);
+      const day = B.buildWeek(B.weekStart(key), state, t).days.find((d) => d.key === key);
+      state.done[key] = { study: true, studyMin: day.study, training: !!(day.training && day.training.isSession) };
+    }
     save();
     renderAll();
     show("week");
@@ -332,6 +468,7 @@
     for (const b of document.querySelectorAll(".tabbar button")) b.classList.toggle("on", b.dataset.view === view);
     if (view === "week") renderWeek();
     if (view === "log") { fillLogForm(today()); renderLog(); $("log-feedback").textContent = ""; }
+    if (view === "rewards") renderRewards();
     if (view === "exams") renderExams();
     if (view === "goals") renderGoals();
     window.scrollTo(0, 0);
@@ -347,8 +484,10 @@
   });
 
   function renderAll() {
+    applyTheme();
     renderWeek();
     renderLog();
+    renderRewards();
     renderExams();
     renderGoals();
   }

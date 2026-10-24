@@ -21,8 +21,11 @@ Balanse finner en mellomvei automatisk, slik at du slipper å planlegge alt selv
 |---|---|
 | **Uke** | Ukeplan dag for dag med lesetid og treningsøkt. Du krysser av for det du har gjort. Knappen «Hvorfor?» forklarer hver anbefaling. Du kan bla mellom uker. |
 | **Logg** | Logg timer søvn og stressnivå (1–5) og se en graf for de siste 14 dagene. |
+| **Premier** | Lese-streak, poeng, nivå og 9 merker som låses opp. Du får en melding og konfetti når du krysser av. |
 | **Eksamener** | Legg til og slett eksamener med nedtelling. |
-| **Mål** | Treningsøkter per uke, minutter per økt, vanlig lesetid og maks lesetid. Her kan du også laste inn eksempeldata til demo. |
+| **Mål** | Treningsøkter per uke, minutter per økt, vanlig lesetid og maks lesetid. Velg mellom 5 temaer (Mint, Fersken, Lavendel, Hav og Natt). Her kan du også laste inn eksempeldata til demo. |
+
+Øverst i ukeplanen viser streak-kortet hvor mange dager på rad du har lest, og det motiverer deg til å lese i dag også.
 
 ## Slik regner appen ut planen
 
@@ -35,7 +38,8 @@ Balanse finner en mellomvei automatisk, slik at du slipper å planlegge alt selv
 4. **Overskudd** fra søvn og stress (snitt av de tre siste loggede dagene). Er overskuddet lavt, går treningen ned ett hakk,
    lesetiden ned 15 %, og du får et søvntips.
 
-All logikk ligger i [`plan.js`](plan.js) og er skilt fra brukergrensesnittet ([`app.js`](app.js)), slik at den kan testes for seg.
+Planlogikken ligger i [`plan.js`](plan.js) og belønningslogikken (streak, poeng og merker) i [`rewards.js`](rewards.js).
+Begge er skilt fra brukergrensesnittet ([`app.js`](app.js)), slik at de kan testes for seg.
 
 ## Teknologi
 
@@ -54,11 +58,12 @@ python -m http.server 8080
 ## Tester
 
 ```bash
-node --test tests/plan.test.js
+node --test tests/plan.test.js tests/rewards.test.js
 ```
 
-Testene sjekker blant annet at rolige uker gir en ekstra økt, at eksamen gir mer lesing og lettere trening,
-at trening aldri kuttes helt, at lite søvn og høyt stress skrur ned belastningen, og at datoer håndteres riktig over sommertidsskiftet.
+De 12 testene sjekker blant annet at rolige uker gir en ekstra økt, at eksamen gir mer lesing og lettere trening,
+at trening aldri kuttes helt, at lite søvn og høyt stress skrur ned belastningen, at datoer håndteres riktig over sommertidsskiftet,
+og at streak, poeng og merker regnes riktig.
 
 ## Legge appen på telefonen
 
@@ -67,10 +72,12 @@ at trening aldri kuttes helt, at lite søvn og høyt stress skrur ned belastning
 
 ## Bruk av KI
 
-Appen er laget med vibe coding i **Claude Code** (Claude Opus 5.5):
+Appen er laget med vibe coding i **Claude Code** (Claude Opus 5.5).
+Hele prosessen, med promptene mine, hva som ble endret, testing og skjermbilder av hver versjon, står i
+**[utviklingsloggen](dokumentasjon/utviklingslogg.md)**.
 
-1. **Idé:** Jeg beskrev ideen min på norsk: én ukeplan for studie og trening som tilpasser seg eksamener, søvn og stress.
-2. **Plan og kode:** KI-en foreslo å lage en PWA (fungerer på mobil uten app-butikk) og skrev planleggingslogikk, grensesnitt og PWA-filer.
-3. **Testing:** KI-en skrev automatiske tester for logikken og testet appen i en nettleser i mobilstørrelse
-   (eksempeldata, logging, eksamensliste, bla mellom uker, sjekk av konsollfeil).
-4. **Forbedringer:** *(fyll inn hva du selv ba om å endre etter å ha prøvd appen, f.eks. tekster, farger, nye funksjoner)*
+1. **Versjon 1:** Jeg beskrev ideen min på norsk. KI-en foreslo å lage en PWA og skrev planleggingslogikk, grensesnitt,
+   PWA-filer og 6 tester. Appen ble testet i nettleser i mobilstørrelse. Den ligger urørt i [`versjon-1/`](versjon-1/).
+2. **Versjon 2:** Etter å ha prøvd appen syntes jeg den var for mørk og manglet motivasjon. Jeg ba om et lysere design,
+   belønninger og streaks, og temaer å velge mellom. KI-en la til streak-kort, poeng, nivåer, merker, konfetti og 5 temaer,
+   pluss 6 nye tester. Under testingen ble en layoutfeil funnet og rettet.

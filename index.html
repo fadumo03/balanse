@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Balanse</title>
   <meta name="description" content="Ukeplan som balanserer lesing og trening ut fra eksamener, søvn og stress.">
-  <meta name="theme-color" content="#2f6f5e">
+  <meta name="theme-color" content="#f7faf8">
+  <script>
+    // Sett valgt tema før siden tegnes, så det ikke blinker.
+    try {
+      var saved = JSON.parse(localStorage.getItem("balanse-v1") || "{}");
+      if (saved.settings && saved.settings.theme) document.documentElement.dataset.theme = saved.settings.theme;
+    } catch (e) {}
+  </script>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -27,6 +34,7 @@
         </div>
         <button class="icon-btn" id="next-week" aria-label="Neste uke">›</button>
       </header>
+      <div id="streak-card"></div>
       <div id="week-summary" class="card summary"></div>
       <div id="log-prompt"></div>
       <div id="days"></div>
@@ -61,6 +69,18 @@
         <div id="log-chart" class="chart"></div>
         <p class="muted small"><span class="key sleep"></span> søvn (timer) &nbsp; <span class="key stress"></span> stress (1–5)</p>
       </div>
+    </section>
+
+    <!-- PREMIER -->
+    <section id="view-rewards" class="view" aria-label="Premier">
+      <header class="top"><div class="top-title"><h1>Premier</h1>
+        <p class="muted">Kryss av lesing og trening for å samle poeng</p></div></header>
+      <div id="level-card" class="card level-card"></div>
+      <div class="card">
+        <h2>Merker</h2>
+        <div id="badge-grid" class="badge-grid"></div>
+      </div>
+      <p class="muted small">Poeng: 10 per leseøkt + 1 per 15 min lest, 5 per treningsøkt. 100 poeng = nytt nivå.</p>
     </section>
 
     <!-- EKSAMENER -->
@@ -99,6 +119,10 @@
         <p class="muted small">Endringer lagres automatisk.</p>
       </form>
       <div class="card">
+        <h2>Tema</h2>
+        <div id="theme-picker" class="themes"></div>
+      </div>
+      <div class="card">
         <h2>Data</h2>
         <p class="muted small">Alt lagres bare på denne enheten.</p>
         <div class="row-buttons">
@@ -112,11 +136,16 @@
   <nav class="tabbar" aria-label="Hovedmeny">
     <button data-view="week" class="on"><span class="tab-ico">▦</span>Uke</button>
     <button data-view="log"><span class="tab-ico">☾</span>Logg</button>
+    <button data-view="rewards"><span class="tab-ico">★</span>Premier</button>
     <button data-view="exams"><span class="tab-ico">✎</span>Eksamener</button>
     <button data-view="goals"><span class="tab-ico">◎</span>Mål</button>
   </nav>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
   <script src="plan.js"></script>
+  <script src="rewards.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
