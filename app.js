@@ -122,6 +122,24 @@
     setTimeout(() => { box.innerHTML = ""; }, 2500);
   }
 
+  // Egen bekreftelsesdialog. confirm() returnerer «nei» uten å vise noe i enkelte nettlesere og installerte apper.
+  function ask(text, okLabel) {
+    return new Promise((resolve) => {
+      $("dialog-text").textContent = text;
+      $("dialog-ok").textContent = okLabel;
+      $("dialog").hidden = false;
+      $("dialog-ok").focus();
+      const done = (answer) => {
+        $("dialog").hidden = true;
+        $("dialog-ok").onclick = null;
+        $("dialog-cancel").onclick = null;
+        resolve(answer);
+      };
+      $("dialog-ok").onclick = () => done(true);
+      $("dialog-cancel").onclick = () => done(false);
+    });
+  }
+
   // ---------- Tema ----------
   function applyTheme() {
     const theme = THEMES.find((x) => x.id === state.settings.theme) || THEMES[0];
@@ -503,8 +521,10 @@
     showFocusPart("focus-done");
   }
 
-  $("give-up").addEventListener("click", () => {
-    if (confirm("Gi opp? Planten visner, og økta teller ikke.")) wither("Du ga opp økta.");
+  $("give-up").addEventListener("click", async () => {
+    const ok = await ask("Gi opp? Planten visner, og økta teller ikke.", "Gi opp");
+    // Økta kan ha blitt ferdig mens dialogen var åpen.
+    if (ok && state.active) wither("Du ga opp økta.");
   });
 
   // Snill modus: inntil 2 minutter utenfor appen er greit.
@@ -643,11 +663,12 @@
     if (!tile) return;
     if (tile.kind === "decor") {
       const d = G.DECOR.find((x) => x.id === tile.id);
-      if (confirm(`Flytte ${d.name.toLowerCase()} tilbake til lageret?`)) {
+      ask(`Flytte ${d.name.toLowerCase()} tilbake til lageret?`, "Flytt").then((ok) => {
+        if (!ok) return;
         G.removeDecor(state, index);
         save();
         renderGarden();
-      }
+      });
       return;
     }
     const s = state.sessions.find((x) => x.id === tile.sid);
@@ -829,8 +850,8 @@
     renderTemplates();
   });
 
-  $("demo-data").addEventListener("click", () => {
-    if (!confirm("Erstatte dataene dine med eksempeldata?")) return;
+  $("demo-data").addEventListener("click", async () => {
+    if (!(await ask("Erstatte dataene dine med eksempeldata?", "Erstatt"))) return;
     const t = today();
     const sleep = [7.5, 8, 7, 6, 5.5, 6, 5];
     const stress = [2, 2, 3, 3, 4, 4, 4];
@@ -870,8 +891,8 @@
     show("week");
   });
 
-  $("reset-data").addEventListener("click", () => {
-    if (!confirm("Slette alle eksamener, logger, hagen og mål?")) return;
+  $("reset-data").addEventListener("click", async () => {
+    if (!(await ask("Slette alle eksamener, logger, hagen og mål?", "Slett alt"))) return;
     state = emptyState();
     save();
     renderAll();

@@ -202,6 +202,34 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ---
 
+## Feilretting etter versjon 4 – «Gi opp» virket ikke
+
+### Feilmelding (min prompt)
+
+> det skjer ingenting når ejg trykker på gi opp
+
+### Hva som var galt
+
+- «Gi opp» brukte nettleserens innebygde bekreftelsesboks (`confirm()`). I appens innebygde nettleser ble den stille blokkert
+  og svarte «nei» med en gang, uten å vise noe. Det samme kan skje i enkelte nettlesere og installerte web-apper.
+  Under KI-ens egne tester var `confirm()` overstyrt, så feilen ble ikke oppdaget før jeg prøvde selv.
+- Etter rettingen fikk nettleseren fortsatt servert gamle filer. Service workeren hentet riktignok fra nettet først,
+  men nettleserens HTTP-cache ga den gamle versjoner. Det ville også rammet ekte brukere etter hver oppdatering.
+
+### Hva KI-en gjorde
+
+- Lagde en egen bekreftelsesdialog inne i appen med «Avbryt» og en tydelig knapp («Gi opp», «Slett alt» osv.).
+  Den brukes nå alle fire stedene som før brukte `confirm()`: gi opp, last inn eksempeldata, slett alt og flytt pynt.
+- Service workeren ber nå alltid serveren sjekke om filene er nye (`cache: "no-cache"`), slik at oppdateringer når fram.
+
+### Testing
+
+- Først ble det bekreftet at `confirm()` faktisk returnerte «nei» på 1 ms uten å vise noe.
+- Deretter ble «Gi opp» testet med ekte klikk: dialogen vises. «Avbryt» lar økta fortsette, og «Gi opp» får planten til å visne.
+- Alle 17 automatiske tester består.
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*

@@ -206,6 +206,17 @@
     </div>
   </div>
 
+  <!-- Egen bekreftelse – nettleserens confirm() blokkeres i enkelte nettlesere og installerte apper -->
+  <div id="dialog" class="dialog" hidden>
+    <div class="dialog-box" role="alertdialog" aria-modal="true" aria-labelledby="dialog-text">
+      <p id="dialog-text"></p>
+      <div class="dialog-actions">
+        <button type="button" id="dialog-cancel">Avbryt</button>
+        <button type="button" id="dialog-ok" class="dialog-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="confetti" class="confetti" aria-hidden="true"></div>
 
