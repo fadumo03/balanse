@@ -154,7 +154,9 @@
       state.sessions.push(session);
       placeInGarden(state, { kind: "plant", sid: session.id });
     }
-    const events = [{ type: "plant", plant, golden: session.golden, minutes: plant.minutes, revived: !!target }];
+    // Har du allerede trent i dag, er hagen vannet og planten blomstrer med én gang.
+    if (state.waterGiven[day]) session.bloomed = true;
+    const events = [{ type: "plant", plant, golden: session.golden, minutes: plant.minutes, revived: !!target, bloomed: session.bloomed }];
 
     const doneToday = grownOn(state, day).length;
     if (doneToday === 3 && !state.fertilizedDays[day]) {
@@ -208,21 +210,24 @@
   }
 
   // ---------- Vann og blomstring ----------
-  // Maks én vanndråpe per dag man har trent, så man ikke kan krysse av og på for å jukse.
+  // Én treningsøkt vanner hele hagen: alle tørste planter blomstrer.
+  // Planter som gror senere samme dag blomstrer med én gang (se completeSession).
+  // Returnerer antall planter som begynte å blomstre.
   function giveWater(state, dayKey) {
     ensure(state);
-    if (state.waterGiven[dayKey]) return false;
     state.waterGiven[dayKey] = true;
-    state.inventory.vann++;
-    return true;
+    let bloomed = 0;
+    for (const s of state.sessions) {
+      if (s.status === "grown" && !s.bloomed) {
+        s.bloomed = true;
+        bloomed++;
+      }
+    }
+    return bloomed;
   }
 
-  function waterPlant(state, sessionId) {
-    const s = state.sessions.find((x) => x.id === sessionId);
-    if (!s || s.status !== "grown" || s.bloomed || state.inventory.vann <= 0) return false;
-    s.bloomed = true;
-    state.inventory.vann--;
-    return true;
+  function thirstyCount(state) {
+    return state.sessions.filter((s) => s.status === "grown" && !s.bloomed).length;
   }
 
   // ---------- Pynt ----------
@@ -267,7 +272,7 @@
   const api = {
     GRACE_MS, COLS, PLANTS, EXAM_FLOWER, WITHERED, DECOR,
     plantInfo, ensure, studyMinutes, totalMinutes, hasStudied, streak, applyFreezes,
-    resolve, completeSession, witherSession, giveWater, waterPlant,
+    resolve, completeSession, witherSession, giveWater, thirstyCount,
     decorStatus, placeDecor, removeDecor, weather, catalog
   };
 

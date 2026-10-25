@@ -261,6 +261,36 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ---
 
+## Forbedring – én treningsøkt vanner hele hagen
+
+### Mine prompter
+
+> hvorfor r d så mange tørste planter? må man trene mer enn 4x i uka for å catche opp da?
+
+KI-en forklarte at det var en svakhet i designet. Man fikk én plante per leseøkt (ofte 2–4 om dagen), men bare én vanndråpe
+per treningsdag, og hver dråpe vannet bare én plante. Med 4–5 treninger i uka kunne man aldri ta igjen plantene.
+I eksamensuker ble det verst, fordi appen selv anbefaler mer lesing og lettere trening, så hagen straffet deg for å følge planen.
+KI-en foreslo to løsninger, og jeg valgte:
+
+> treningsøkt som vanner hele hagen
+
+### Hva KI-en gjorde
+
+- Når du krysser av for trening, blomstrer **alle** tørste planter i hagen på én gang. Du får en melding som
+  «Hagen er vannet – 2 planter blomstrer».
+- Har du allerede trent i dag, blomstrer planter du får resten av dagen med én gang.
+- Vanndråpene i lageret er fjernet, fordi de ikke trengs lenger. I stedet viser lageret hvor mange planter som er tørste.
+- Grå planter betyr nå bare «du har lest, men ikke beveget deg siden sist», og én treningsøkt fikser det.
+
+### Testing
+
+- **2 nye automatiske tester**, så nå er det 20 som alle består. Den ene sjekker at én økt vanner alle seks tørste planter
+  og ikke de visne. Den andre sjekker at planter som gror etter dagens trening blomstrer med én gang, men ikke neste dag.
+- Testet i nettleseren med eksempeldata: Før treningen var det 8 blomstrende og 2 tørste planter.
+  Etter at dagens trening ble krysset av, blomstret alle 10.
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*

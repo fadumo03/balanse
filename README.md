@@ -21,7 +21,7 @@ Balanse finner en mellomvei automatisk. Hagen gir deg en ærlig og synlig beløn
 |---|---|
 | **Uke** | Ukeplan dag for dag. Lesing startes med «▶ Les nå» og fylles av timer-tid. Trening hentes fra dine egne økter, kan byttes per dag og krysses av. «Hvorfor?» forklarer hver anbefaling. Streak-kortet viser hvor mange dager på rad du har lest. |
 | **Logg** | Logg søvn og stress (1–5) og se en graf for de siste 14 dagene. Påvirker planen og været i hagen. |
-| **Hage** | Alle plantene dine, været, lageret (💧 vann, 🌾 gjødsel, 🧊 streak-frys), pynt du kan plassere og en frøkatalog over alle plantene. |
+| **Hage** | Alle plantene dine, været, lageret (tørste planter, gjødsel og streak-frys), pynt du kan plassere og en frøkatalog over alle plantene. |
 | **Eksamener** | Legg til og slett eksamener med nedtelling. |
 | **Mål** | Treningsmål, lesetid, dine egne treningsøkter for Hard, Moderat og Lett, 5 temaer og eksempeldata til demo. |
 
@@ -40,7 +40,7 @@ så blir den til den opprinnelige planten igjen i samme rute.
 
 ### Ting du vinner
 
-- **Vann:** fås når du har trent, maks én per dag. Får en plante til å blomstre.
+- **Vann:** én treningsøkt vanner hele hagen, så alle tørste planter blomstrer. Planter du får senere samme dag blomstrer med én gang.
 - **Gjødsel:** fås etter 3 økter på én dag. Neste plante blir gyllen.
 - **Streak-frys:** fås for hver 7. dag på rad. Redder streaken automatisk en dag du glemmer.
 - **Eksamensblomst:** fås når du fullfører en økt dagen før en eksamen.
@@ -83,7 +83,7 @@ python -m http.server 8080
 node --test tests/plan.test.js tests/garden.test.js
 ```
 
-De 19 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
+De 20 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
 og hagen (timer og visning, gjenoppliving, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler).
 
 ## Legge appen på telefonen

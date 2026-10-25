@@ -113,16 +113,24 @@ test("eksamensblomst dagen før eksamen, bare én per eksamen", () => {
   assert.strictEqual(G.catalog(s).find((c) => c.id === "eksamen").count, 1);
 });
 
-test("trening gir maks én vanndråpe per dag, og vann får planter til å blomstre", () => {
+test("én treningsøkt vanner hele hagen", () => {
   const s = fresh();
-  grow(s, "2026-10-24");
-  assert.strictEqual(G.giveWater(s, "2026-10-24"), true);
-  assert.strictEqual(G.giveWater(s, "2026-10-24"), false);
-  assert.strictEqual(s.inventory.vann, 1);
-  const id = s.sessions[0].id;
-  assert.strictEqual(G.waterPlant(s, id), true);
-  assert.strictEqual(s.sessions[0].bloomed, true);
-  assert.strictEqual(G.waterPlant(s, id), false);
+  for (let h = 8; h < 13; h++) grow(s, "2026-10-23", "spire", h);
+  grow(s, "2026-10-24", "tre", 8);
+  G.witherSession(s, { start: at("2026-10-24", 10), plant: "tulipan", minutes: 45 }, at("2026-10-24", 11));
+  assert.strictEqual(G.thirstyCount(s), 6);
+  assert.strictEqual(G.giveWater(s, "2026-10-24"), 6); // alle seks blomstrer på én gang
+  assert.strictEqual(G.thirstyCount(s), 0);
+  assert.strictEqual(s.sessions.find((x) => x.status === "withered").bloomed, undefined); // visne planter vannes ikke
+});
+
+test("planter som gror etter dagens trening blomstrer med én gang", () => {
+  const s = fresh();
+  G.giveWater(s, "2026-10-24");
+  const events = grow(s, "2026-10-24", "tulipan", 18);
+  assert.strictEqual(events[0].bloomed, true);
+  grow(s, "2026-10-25", "tulipan", 10); // ny dag, ikke trent ennå
+  assert.strictEqual(G.thirstyCount(s), 1);
 });
 
 test("pynt låses opp etter 5 timer og kan plasseres i hagen", () => {

@@ -309,7 +309,7 @@
            <input type="checkbox" data-day="${day.key}" data-kind="training" aria-label="Trening gjort" ${done.training ? "checked" : ""}>
            <span class="dot train"></span>
            <span class="task-text"><strong>${tr.label}</strong> · ${escapeHtml(tr.activity)}
-             <small>${tr.minutes} min · gir vann til hagen</small>
+             <small>${tr.minutes} min · vanner hele hagen</small>
              ${swapSelect(day)}</span>
          </div>`
       : `<div class="task rest"><span class="dot rest"></span><span class="task-text">Hviledag ${swapSelect(day)}</span></div>`;
@@ -353,11 +353,17 @@
     if (!el.matches("input[data-kind=training]")) return;
     const key = el.dataset.day;
     state.done[key] = Object.assign({}, state.done[key], { training: el.checked });
-    let msg = null;
-    if (el.checked) msg = G.giveWater(state, key) ? "+1 vann til hagen. Bruk det til å få en plante til å blomstre." : "Bra jobba!";
+    let bloomed = 0;
+    if (el.checked) bloomed = G.giveWater(state, key);
     save();
     renderWeek();
-    if (msg) toast(msg);
+    if (!el.checked) return;
+    if (bloomed) {
+      toast(`Hagen er vannet – ${bloomed} ${bloomed === 1 ? "plante blomstrer" : "planter blomstrer"}`);
+      confetti(30);
+    } else {
+      toast("Bra jobba! Hagen er vannet.");
+    }
   });
 
   $("prev-week").addEventListener("click", () => {
@@ -620,10 +626,12 @@
       hint.hidden = true;
     }
 
-    const thirsty = state.sessions.filter((s) => s.status === "grown" && !s.bloomed).length;
+    const thirsty = G.thirstyCount(state);
     $("inventory").innerHTML = `
-      <div class="inv"><span class="inv-ico water">${icon("droplet")}</span><strong>${state.inventory.vann}</strong>
-        <span class="inv-text"><b>Vann</b><small>Fås når du trener. Trykk på en plante for å få den til å blomstre${thirsty ? ` (${thirsty} venter)` : ""}.</small></span></div>
+      <div class="inv"><span class="inv-ico water">${icon("droplet")}</span><strong>${thirsty}</strong>
+        <span class="inv-text"><b>Tørste planter</b><small>${thirsty ? "Én treningsøkt vanner hele hagen, så alle blomstrer."
+          : state.waterGiven[t] ? "Du har trent i dag. Planter du får resten av dagen blomstrer med én gang."
+          : "Alle plantene blomstrer. Tren for å vanne neste plante du får."}</small></span></div>
       <div class="inv"><span class="inv-ico gold">${icon("sparkles")}</span><strong>${state.inventory.gjodsel}</strong>
         <span class="inv-text"><b>Gjødsel</b><small>Fås etter 3 økter på én dag. Gjør neste plante gyllen.</small></span></div>
       <div class="inv"><span class="inv-ico ice">${icon("snowflake")}</span><strong>${state.inventory.frys}</strong>
@@ -693,17 +701,7 @@
         .then((ok) => { if (ok && !state.active) startSession(wanted.id, false, s.id); });
       return;
     }
-    if (!s.bloomed) {
-      if (G.waterPlant(state, s.id)) {
-        save();
-        renderGarden();
-        toast(`${info.name} blomstrer`);
-        confetti(20);
-      } else {
-        toast("Planten er tørst. Tren for å få vann.");
-      }
-      return;
-    }
+    if (!s.bloomed) return toast("Planten er tørst. Én treningsøkt vanner hele hagen.");
     toast(`${s.golden ? "Gyllen " : ""}${info.name}${s.subject ? ` for ${s.subject}` : ""} · ${fmtDate(s.day)}${s.minutes ? ` · ${s.minutes} min` : ""}`);
   });
 
@@ -902,8 +900,7 @@
         G.giveWater(state, key);
       }
     }
-    // Vann én plante (så det er vann igjen å prøve med) og plasser benken.
-    G.waterPlant(state, state.sessions.find((s) => s.status === "grown").id);
+    // Plasser benken. Plantene fra i går er tørste, så man kan se at trening vanner hele hagen.
     G.placeDecor(state, "benk", state.garden.tiles.indexOf(null) + 2);
     save();
     renderAll();
