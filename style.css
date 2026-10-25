@@ -658,7 +658,8 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
 }
 .dialog-box p { margin: 0 0 18px; font-weight: 500; }
 .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.dialog-ok { background: var(--exam); border-color: var(--exam); color: #fff; font-weight: 600; }
+.dialog-ok { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+.dialog-ok.destructive { background: var(--exam); border-color: var(--exam); color: #fff; }
 
 /* ---------- Feiring ---------- */
 .toast {

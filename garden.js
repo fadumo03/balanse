@@ -15,8 +15,8 @@
     { id: "spire", name: "Spire", minutes: 25 },
     { id: "tulipan", name: "Tulipan", minutes: 45 },
     { id: "solsikke", name: "Solsikke", minutes: 45 },
-    { id: "tre", name: "Tre", minutes: 60 },
-    { id: "kirsebaer", name: "Kirsebærtre", minutes: 90 }
+    { id: "tre", name: "Tre", minutes: 60, article: "et" },
+    { id: "kirsebaer", name: "Kirsebærtre", minutes: 90, article: "et" }
   ];
   const EXAM_FLOWER = { id: "eksamen", name: "Eksamensblomst" };
   const WITHERED = { id: "visnet", name: "Visnet plante" };
@@ -114,24 +114,47 @@
     return nowMs >= end ? "complete" : "continue";
   }
 
+  // Den visne planten en økt prøver å gjenopplive, hvis den fortsatt er vissen.
+  function reviveTarget(state, active) {
+    if (!active.revive) return null;
+    return state.sessions.find((s) => s.id === active.revive && s.status === "withered") || null;
+  }
+
   function completeSession(state, active, nowMs, exams) {
     ensure(state);
     const plant = plantInfo(active.plant);
     const day = B.toKey(new Date(active.start));
     const before = totalMinutes(state);
-    const session = {
-      id: String(active.start),
-      day,
-      plant: plant.id,
-      minutes: plant.minutes,
-      status: "grown",
-      golden: !!active.golden,
-      bloomed: false,
-      end: nowMs
-    };
-    state.sessions.push(session);
-    placeInGarden(state, { kind: "plant", sid: session.id });
-    const events = [{ type: "plant", plant, golden: session.golden, minutes: plant.minutes }];
+    const target = reviveTarget(state, active);
+    let session;
+    if (target) {
+      // Gjenoppliving: den visne planten blir til den opprinnelige planten igjen, i samme rute.
+      session = Object.assign(target, {
+        day,
+        plant: plant.id,
+        minutes: plant.minutes,
+        status: "grown",
+        golden: !!active.golden,
+        bloomed: false,
+        revived: true,
+        end: nowMs
+      });
+      delete session.wanted;
+    } else {
+      session = {
+        id: String(active.start),
+        day,
+        plant: plant.id,
+        minutes: plant.minutes,
+        status: "grown",
+        golden: !!active.golden,
+        bloomed: false,
+        end: nowMs
+      };
+      state.sessions.push(session);
+      placeInGarden(state, { kind: "plant", sid: session.id });
+    }
+    const events = [{ type: "plant", plant, golden: session.golden, minutes: plant.minutes, revived: !!target }];
 
     const doneToday = grownOn(state, day).length;
     if (doneToday === 3 && !state.fertilizedDays[day]) {
@@ -167,6 +190,9 @@
 
   function witherSession(state, active, nowMs) {
     ensure(state);
+    // Et mislykket gjenopplivingsforsøk lager ikke enda en vissen plante – den gamle blir stående.
+    const target = reviveTarget(state, active);
+    if (target) return target;
     const session = {
       id: String(active.start),
       day: B.toKey(new Date(active.start)),

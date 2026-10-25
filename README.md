@@ -35,6 +35,8 @@ Balanse finner en mellomvei automatisk. Hagen gir deg en ærlig og synlig beløn
 | 90 min | Kirsebærtre |
 
 Skjermen holdes på under økta. **Snill modus:** Du kan gå ut av appen i inntil 2 minutter. Er du borte lenger, visner planten.
+En vissen plante kan **gjenopplives**: trykk på den i hagen og les like lenge som den opprinnelige planten krevde,
+så blir den til den opprinnelige planten igjen i samme rute.
 
 ### Ting du vinner
 
@@ -81,8 +83,8 @@ python -m http.server 8080
 node --test tests/plan.test.js tests/garden.test.js
 ```
 
-De 17 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
-og hagen (timer og visning, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler).
+De 19 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
+og hagen (timer og visning, gjenoppliving, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler).
 
 ## Legge appen på telefonen
 

@@ -94,6 +94,11 @@
     return 1 + Math.round(((target - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
   }
 
+  // «en tulipan», «et tre»
+  function withArticle(plant) {
+    return `${plant.article || "en"} ${plant.name.toLowerCase()}`;
+  }
+
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
@@ -123,10 +128,11 @@
   }
 
   // Egen bekreftelsesdialog. confirm() returnerer «nei» uten å vise noe i enkelte nettlesere og installerte apper.
-  function ask(text, okLabel) {
+  function ask(text, okLabel, destructive = true) {
     return new Promise((resolve) => {
       $("dialog-text").textContent = text;
       $("dialog-ok").textContent = okLabel;
+      $("dialog-ok").classList.toggle("destructive", destructive);
       $("dialog").hidden = false;
       $("dialog-ok").focus();
       const done = (answer) => {
@@ -425,23 +431,27 @@
     for (const b of $("seed-list").children) b.classList.toggle("on", b === btn);
   });
 
-  $("start-focus").addEventListener("click", () => {
-    const plant = G.plantInfo(selectedPlant);
-    const golden = $("use-golden").checked && state.inventory.gjodsel > 0;
+  function startSession(plantId, golden, revive) {
+    const plant = G.plantInfo(plantId);
     if (golden) state.inventory.gjodsel--;
     state.active = { start: Date.now(), plant: plant.id, minutes: plant.minutes, golden };
+    if (revive) state.active.revive = revive;
     save();
     keepAwake();
     showRun();
+  }
+
+  $("start-focus").addEventListener("click", () => {
+    startSession(selectedPlant, $("use-golden").checked && state.inventory.gjodsel > 0, null);
   });
 
   let lastStage = null;
   function showRun() {
     showFocusPart("focus-run");
     const plant = G.plantInfo(state.active.plant);
-    $("focus-label").textContent = state.active.golden
-      ? `Gyllen ${plant.name.toLowerCase()} gror mens du leser`
-      : `${plant.name} gror mens du leser`;
+    if (state.active.revive) $("focus-label").textContent = `Den visne planten blir til ${withArticle(plant)} igjen`;
+    else if (state.active.golden) $("focus-label").textContent = `Gyllen ${plant.name.toLowerCase()} gror mens du leser`;
+    else $("focus-label").textContent = `${plant.name} gror mens du leser`;
     lastStage = null;
     clearInterval(tickTimer);
     tick();
@@ -488,6 +498,7 @@
     const day = B.toKey(new Date(a.start));
     const planned = B.buildWeek(B.weekStart(day), state, today()).days.find((d) => d.key === day);
     const lines = events.map((ev) => {
+      if (ev.type === "plant" && ev.revived) return rewardLine(art(ev.plant.id), `Den visne planten er gjenopplivet og ble til ${withArticle(ev.plant)} igjen`);
       if (ev.type === "plant") return rewardLine(art(ev.plant.id), `${ev.golden ? "Gyllen " : ""}${ev.plant.name} er plantet i hagen`);
       if (ev.type === "exam") return rewardLine(art("eksamen"), `Eksamensblomst for ${escapeHtml(ev.subject)}. Lykke til i morgen!`);
       if (ev.type === "gjodsel") return rewardLine(icon("sparkles"), "Gjødsel: tre økter i dag. Neste plante kan bli gyllen.");
@@ -507,6 +518,7 @@
 
   function wither(reason) {
     const a = state.active;
+    const wasRevive = !!a.revive;
     clearInterval(tickTimer);
     G.witherSession(state, a, Date.now());
     state.active = null;
@@ -515,9 +527,11 @@
     renderAll();
     $("done-icon").innerHTML = art("visnet");
     $("done-icon").classList.remove("golden");
-    $("done-title").textContent = "Planten visnet";
+    $("done-title").textContent = wasRevive ? "Ikke gjenopplivet denne gangen" : "Planten visnet";
     $("done-rewards").innerHTML = rewardLine(icon("clock"), reason)
-      + rewardLine(icon("info"), "Den visne planten blir stående i hagen. Prøv igjen – en kortere økt er også fin.");
+      + rewardLine(icon("info"), wasRevive
+        ? "Planten står fortsatt i hagen, og du kan prøve igjen når du vil."
+        : `Trykk på den i hagen for å gjenopplive den: les ${a.minutes} min i strekk, så får du planten tilbake.`);
     showFocusPart("focus-done");
   }
 
@@ -663,7 +677,7 @@
     if (!tile) return;
     if (tile.kind === "decor") {
       const d = G.DECOR.find((x) => x.id === tile.id);
-      ask(`Flytte ${d.name.toLowerCase()} tilbake til lageret?`, "Flytt").then((ok) => {
+      ask(`Flytte ${d.name.toLowerCase()} tilbake til lageret?`, "Flytt", false).then((ok) => {
         if (!ok) return;
         G.removeDecor(state, index);
         save();
@@ -673,7 +687,12 @@
     }
     const s = state.sessions.find((x) => x.id === tile.sid);
     const info = G.plantInfo(s.plant);
-    if (s.status === "withered") return toast(`Visnet ${fmtDate(s.day)} – økta ble ikke fullført`);
+    if (s.status === "withered") {
+      const wanted = G.plantInfo(s.wanted || "tulipan");
+      ask(`Gjenoppliv planten? Les ${wanted.minutes} min i strekk, så blir den til ${withArticle(wanted)} igjen.`, "Start økt", false)
+        .then((ok) => { if (ok && !state.active) startSession(wanted.id, false, s.id); });
+      return;
+    }
     if (!s.bloomed) {
       if (G.waterPlant(state, s.id)) {
         save();

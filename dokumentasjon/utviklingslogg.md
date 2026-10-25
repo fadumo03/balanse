@@ -230,6 +230,37 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ---
 
+## Forbedring – gjenopplive visne planter
+
+### Min prompt
+
+> blir den visnede planten der for alltid? d kan være litt demotiverende. burde kansje få mulighet til åf jerne de
+> enten med poeng eller ved å else de timene som den orginale planten requiara?
+
+### Hva KI-en gjorde
+
+- Poengsystemet ble fjernet i versjon 3, så vi valgte det andre forslaget: **du gjenoppliver en vissen plante ved å lese like lenge
+  som den opprinnelige planten krevde.**
+- Trykk på en vissen plante i hagen. Da kommer for eksempel «Gjenoppliv planten? Les 60 min i strekk, så blir den til et tre igjen».
+  Med «Start økt» starter timeren med riktig plante og lengde.
+- Fullfører du, blir den visne planten til den opprinnelige planten igjen **i samme rute**. Minuttene teller på dagen du leste,
+  og streak, gjødsel og pynt fungerer som vanlig.
+- Gir du opp eller er borte for lenge under et gjenopplivingsforsøk, blir det **ikke** en ny vissen plante.
+  Den gamle står bare der til du prøver igjen. Det skal ikke være straff å prøve.
+- Skjermen for en vissen plante forteller nå at den kan gjenopplives, og hvor lenge du må lese.
+
+### Testing og forbedringer
+
+- **2 nye automatiske tester**, så nå er det 19 som alle består. Den ene sjekker at planten gjenopplives i samme rute
+  og at minuttene teller riktig. Den andre sjekker at et mislykket forsøk ikke lager en ny vissen plante.
+- Testet i nettleseren: Jeg trykket på en vissen plante og fullførte en gjenopplivingsøkt.
+  Antall visne planter gikk fra 4 til 3, og det totale antallet planter var det samme.
+- **Feil funnet og rettet:** Teksten sa «en tre». Plantene har nå riktig kjønn, så det står «et tre» og «et kirsebærtre».
+- Knappen i bekreftelsesdialogen er rød bare for handlinger du ikke kan angre, som «Gi opp» og «Slett alt».
+  For «Start økt» er den grønn.
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*

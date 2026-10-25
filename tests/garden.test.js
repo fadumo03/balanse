@@ -51,6 +51,28 @@ test("visnet plante gir ingen minutter og ingen streak", () => {
   assert.strictEqual(G.streak(s, "2026-10-24"), 0);
 });
 
+test("visnet plante kan gjenopplives i samme rute ved å lese like lenge", () => {
+  const s = fresh();
+  const dead = G.witherSession(s, { start: at("2026-10-23"), plant: "tre", minutes: 60 }, at("2026-10-23", 11));
+  const tile = s.garden.tiles.findIndex((t) => t && t.sid === dead.id);
+  const active = { start: at("2026-10-24"), plant: "tre", minutes: 60, revive: dead.id };
+  const events = G.completeSession(s, active, active.start + 60 * MIN, []);
+  assert.strictEqual(events[0].revived, true);
+  assert.strictEqual(s.sessions.length, 1); // ingen ny plante, den gamle er gjenopplivet
+  assert.strictEqual(s.sessions[0].status, "grown");
+  assert.strictEqual(s.sessions[0].plant, "tre");
+  assert.strictEqual(s.garden.tiles[tile].sid, dead.id); // samme rute
+  assert.strictEqual(G.studyMinutes(s, "2026-10-24"), 60); // teller på dagen du leste
+});
+
+test("mislykket gjenoppliving lager ikke enda en vissen plante", () => {
+  const s = fresh();
+  const dead = G.witherSession(s, { start: at("2026-10-23"), plant: "tulipan", minutes: 45 }, at("2026-10-23", 11));
+  G.witherSession(s, { start: at("2026-10-24"), plant: "tulipan", minutes: 45, revive: dead.id }, at("2026-10-24", 11));
+  assert.strictEqual(s.sessions.length, 1);
+  assert.strictEqual(s.garden.tiles.filter(Boolean).length, 1);
+});
+
 test("tre økter samme dag gir gjødsel én gang", () => {
   const s = fresh();
   grow(s, "2026-10-24", "spire", 9);
