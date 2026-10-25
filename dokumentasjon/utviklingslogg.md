@@ -545,9 +545,3 @@ Chrome, som ble brukt under testingen, viser dette riktig, og derfor ble ikke fe
 - Underveis gikk en automatisk erstatning i CSS-en galt, og alle kolonnetallene forsvant (`repeat(, …)`). Dette ble oppdaget med en gang
   og rettet med et eget skript som setter inn riktig tall for hvert rutenett.
 - Bekreftet på iPhone etter at rettingen var lagt ut: hagen vises nå riktig og holder seg innenfor skjermen.
-
----
-
-## Neste versjon
-
-*(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*
