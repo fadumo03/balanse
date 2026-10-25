@@ -525,7 +525,15 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
   Utkastet var allerede sendt, og VibeOff endrer utkast på gjennomgangssiden, ikke via et nytt utkast.
   KI-en lagde derfor et nytt forsidebilde ([`vibeoff-forside.png`](vibeoff-forside.png)) med «Trening vanner hele hagen» i stedet,
-  og en ny tekst til «Hvordan den ble laget» som jeg legger inn selv før jeg publiserer.
+  og en ny tekst til «Hvordan den ble laget».
+- Jeg ville heller ikke ha med de fem skjermbildene, siden de vises i videoen uansett:
+
+  > fjern de bildene, føler d er litt unødvendig og tar mye plass og de vises i video uansett
+
+  > nei send nytt
+
+  KI-en sendte et nytt utkast (`p-ed6ecfbc`) med bare det nye forsidebildet og videoen, og teksten uten testene.
+  Det første utkastet (`p-f92c459c`) ligger fortsatt på samme gjennomgangslenke, men skal ikke publiseres.
 
 ---
 
