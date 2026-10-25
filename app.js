@@ -132,6 +132,118 @@
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
+  // ---------- Datovelger ----------
+  // Egen kalender i stedet for nettleserens <input type="date">, som ser forskjellig og gammeldags ut på hver enhet.
+  // Verdien ligger i et skjult felt (ÅÅÅÅ-MM-DD) og sendes videre med et vanlig "change"-event.
+  const MONTHS_LONG = ["januar", "februar", "mars", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "desember"];
+
+  function fmtLong(key) {
+    const d = B.parseKey(key);
+    const text = `${WEEKDAYS[d.getDay()]} ${d.getDate()}. ${MONTHS_LONG[d.getMonth()]}`;
+    const year = d.getFullYear() !== new Date().getFullYear() ? ` ${d.getFullYear()}` : "";
+    return text.charAt(0).toUpperCase() + text.slice(1) + year;
+  }
+
+  function dateField(attrs, value, { placeholder = "Velg dato", clearable = false, label = "Velg dato" } = {}) {
+    return `<div class="date-field ${value ? "" : "empty"}" data-placeholder="${placeholder}" ${clearable ? 'data-clearable="true"' : ""}>
+      <input type="hidden" ${attrs} value="${value || ""}">
+      <button type="button" class="date-btn" data-date-picker aria-label="${label}">${icon("calendar")}<span class="date-text">${value ? fmtLong(value) : placeholder}</span></button>
+    </div>`;
+  }
+
+  function syncDateField(input) {
+    const wrap = input.closest(".date-field");
+    wrap.querySelector(".date-text").textContent = input.value ? fmtLong(input.value) : wrap.dataset.placeholder;
+    wrap.classList.toggle("empty", !input.value);
+  }
+
+  let dpInput = null;
+  let dpMonth = null; // første dag i måneden som vises
+
+  function openDatePicker(input) {
+    dpInput = input;
+    const start = input.value || today();
+    dpMonth = `${start.slice(0, 7)}-01`;
+    const clearable = !!input.closest(".date-field").dataset.clearable;
+    $("dp-clear").hidden = !clearable;
+    $("dp-clear").parentElement.hidden = !clearable;
+    renderDatePicker();
+    $("datepicker").hidden = false;
+    positionDatePicker(input.closest(".date-field").querySelector(".date-btn"));
+  }
+
+  // Plasser kalenderen rett under datofeltet, eller over hvis det ikke er plass nedenfor.
+  function positionDatePicker(anchor) {
+    const box = $("datepicker").querySelector(".sheet-box");
+    const r = anchor.getBoundingClientRect();
+    const w = box.offsetWidth;
+    const h = box.offsetHeight;
+    let top = r.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
+    const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    box.style.top = `${top}px`;
+    box.style.left = `${left}px`;
+  }
+
+  function closeDatePicker() {
+    $("datepicker").hidden = true;
+    dpInput = null;
+  }
+
+  function renderDatePicker() {
+    const t = today();
+    const first = B.parseKey(dpMonth);
+    $("dp-title").textContent = `${MONTHS_LONG[first.getMonth()].replace(/^./, (c) => c.toUpperCase())} ${first.getFullYear()}`;
+    const events = new Set(B.planItems(state.subjects).map((x) => x.date));
+    const gridStart = B.addDays(dpMonth, -((first.getDay() + 6) % 7)); // mandag før (eller lik) den 1.
+    const month = first.getMonth();
+    let html = "";
+    for (let i = 0; i < 42; i++) {
+      const key = B.addDays(gridStart, i);
+      const d = B.parseKey(key);
+      if (i === 35 && d.getMonth() !== month) break; // dropp en tom sjette rad
+      const cls = [
+        d.getMonth() !== month ? "other" : "",
+        key === t ? "today" : "",
+        dpInput && key === dpInput.value ? "selected" : "",
+        events.has(key) ? "event" : ""
+      ].join(" ");
+      html += `<button type="button" class="dp-day ${cls}" data-dp-day="${key}" aria-label="${fmtLong(key)}">${d.getDate()}</button>`;
+    }
+    $("dp-grid").innerHTML = html;
+    const quick = [["I dag", 0], ["I morgen", 1], ["Om en uke", 7], ["Om to uker", 14]];
+    $("dp-quick").innerHTML = quick.map(([label, n]) => `<button type="button" class="chip-btn" data-dp-day="${B.addDays(t, n)}">${label}</button>`).join("");
+  }
+
+  function chooseDate(key) {
+    const input = dpInput;
+    closeDatePicker();
+    if (!input) return;
+    input.value = key;
+    syncDateField(input);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-date-picker]");
+    if (btn) openDatePicker(btn.closest(".date-field").querySelector("input"));
+  });
+  $("datepicker").addEventListener("click", (e) => {
+    if (e.target === $("datepicker")) return closeDatePicker(); // trykk utenfor
+    const day = e.target.closest("[data-dp-day]");
+    if (day) return chooseDate(day.dataset.dpDay);
+    const move = e.target.closest("[data-dp-move]");
+    if (move) {
+      const d = B.parseKey(dpMonth);
+      d.setMonth(d.getMonth() + Number(move.dataset.dpMove));
+      dpMonth = B.toKey(d);
+      renderDatePicker();
+    }
+  });
+  $("dp-clear").addEventListener("click", () => chooseDate(""));
+  window.addEventListener("resize", () => { if (dpInput) closeDatePicker(); });
+  window.addEventListener("scroll", () => { if (dpInput) closeDatePicker(); }, { passive: true });
+
   // ---------- Feiring ----------
   let toastTimer;
   function toast(text) {
@@ -995,6 +1107,7 @@
   function fillLogForm(key) {
     const entry = state.logs[key];
     $("log-date").value = key;
+    syncDateField($("log-date"));
     $("log-sleep").value = entry ? entry.sleep : 7.5;
     $("sleep-out").textContent = `${String($("log-sleep").value).replace(".", ",")} t`;
     setStress(entry ? entry.stress : 3);
@@ -1127,9 +1240,9 @@
             <div class="segmented three">${difficultyButtons(s.difficulty, "set-diff")}</div>
             <p class="muted small">Vanskelige fag får mer av lesetiden når appen fordeler dagen.</p>
           </fieldset>
-          <label class="field">Eksamensdato
-            <input type="date" data-exam-date value="${s.examDate || ""}">
-          </label>
+          <div class="field">Eksamensdato
+            ${dateField("data-exam-date", s.examDate, { placeholder: "Ingen eksamensdato", clearable: true, label: "Velg eksamensdato" })}
+          </div>
           ${s.examDate ? `<p class="muted small">${B.daysBetween(t, s.examDate) < 0 ? "Eksamen er ferdig." : `Eksamen ${B.whenText(B.daysBetween(t, s.examDate))}.`}${state.examFlowers[s.id] ? " Du har fått eksamensblomsten." : ""}</p>` : ""}
           <label class="field">Navn
             <input type="text" data-rename maxlength="40" value="${escapeHtml(s.name)}">
@@ -1162,9 +1275,9 @@
           <label class="field">Navn
             <input type="text" name="title" maxlength="60" placeholder="F.eks. Oblig 3" required>
           </label>
-          <label class="field">Frist
-            <input type="date" name="due" required>
-          </label>
+          <div class="field">Frist
+            ${dateField('name="due"', "", { placeholder: "Velg frist", label: "Velg frist" })}
+          </div>
           <label class="field">Påminnelse ${remindSelect(3, 'name="remind"')}</label>
           <button type="submit" class="primary">Legg til oblig</button>
         </form>
@@ -1198,6 +1311,8 @@
     state.subjects.push({ id: uid(), name, difficulty: newDifficulty, examDate: $("subject-exam").value || null, obliger: [] });
     save();
     $("subject-form").reset();
+    $("subject-exam").value = "";
+    syncDateField($("subject-exam"));
     newDifficulty = 2;
     renderSubjects();
     toast(`${name} er lagt til.`);
@@ -1274,7 +1389,12 @@
     const s = subjectById(openSubject);
     const title = form.elements.title.value.trim();
     const due = form.elements.due.value;
-    if (!title || !due) return;
+    if (!title) return;
+    // Det skjulte datofeltet støtter ikke «required», så vi sjekker selv.
+    if (!due) {
+      toast("Velg en frist først.");
+      return form.querySelector("[data-date-picker]").click();
+    }
     s.obliger.push({ id: uid(), title, due, done: false, remind: Number(form.elements.remind.value) });
     save();
     renderAll();
@@ -1448,6 +1568,8 @@
     renderSubjects();
     renderGoals();
   }
+
+  syncDateField($("subject-exam"));
 
   // Oppstart: bruk streak-frys om nødvendig, og fortsett en økt som var i gang.
   const frozen = G.applyFreezes(state, today());

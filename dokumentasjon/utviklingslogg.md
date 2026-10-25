@@ -433,6 +433,44 @@ dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
 
 ---
 
+## Forbedring – egen datovelger
+
+### Mine prompter
+
+> liker ikke datoformatet. ser primittivt ut. få d til å se mer moderne/FINT UT. mener lzm kalenderen som kommer opp
+
+Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjermen:
+
+> omg den kalenderen var SVÆR? samme sizze som istad bare bedre lol
+
+### Hva KI-en gjorde
+
+- Nettleserens innebygde datovelger («dd.mm.åååå» og en grå kalender som ser forskjellig ut på hver enhet) er byttet ut
+  med en egen datovelger alle fire stedene: logg, nytt fag, eksamensdato og oblig-frist.
+- **Datofeltet** viser datoen pent, for eksempel «Fredag 30. oktober», med et kalenderikon. Er feltet tomt, står det for eksempel «Velg frist».
+- **Kalenderen:**
+  - åpner seg rett under feltet, eller over hvis det ikke er plass nedenfor, og er omtrent like stor som den gamle (ca. 290 px bred)
+  - har norske ukedager, mandag først, og I dag har en ring rundt
+  - viser valgt dag fylt med farge, og små prikker på dager som allerede har en eksamen eller frist
+  - har snarveiene «I dag», «I morgen», «Om en uke» og «Om to uker»
+  - velger dagen og lukkes med ett trykk, og lukkes også når du trykker utenfor
+  - har «Fjern dato» der datoen er valgfri
+- **Første versjon var for stor**, en bunnark over halve skjermen. Etter tilbakemeldingen ble den gjort om til en liten kalender ved feltet.
+
+### Testing
+
+- Testet i mobilstørrelse:
+  - Du kan velge dag, bla til neste måned og bruke snarveiene.
+  - Kalenderen lukkes når du trykker utenfor.
+  - Den åpner seg over feltet når feltet ligger langt nede på skjermen.
+  - Feltet viser riktig dato etterpå.
+- Det skjulte datofeltet støtter ikke «påkrevd felt», så appen sjekker nå selv at obligen har fått en frist, og åpner kalenderen hvis den mangler.
+- Alle 28 automatiske tester består.
+
+![Datovelger](skjermbilder/versjon-5/7-datovelger.jpg)
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*
