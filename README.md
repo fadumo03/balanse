@@ -104,7 +104,7 @@ De 28 testene sjekker:
 ## Bruk av KI
 
 Appen er laget med vibe coding i **Claude Code** (Claude Opus 5.5).
-Hele prosessen, med promptene mine, hva som ble endret, testing og skjermbilder av hver versjon, står i
+Hele prosessen, med tilbakemeldingene mine, hva som ble endret, testing og skjermbilder av hver versjon, står i
 **[utviklingsloggen](dokumentasjon/utviklingslogg.md)**.
 
 1. **Versjon 1** ([`versjon-1/`](versjon-1/)): Jeg beskrev ideen min. KI-en foreslo å lage en PWA og skrev planlogikk,

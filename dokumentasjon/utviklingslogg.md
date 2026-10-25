@@ -2,6 +2,7 @@
 
 Denne loggen viser hvordan appen ble til med vibe coding i Claude Code, fra første idé til dagens versjon.
 For hver versjon står det hva jeg ba om, hva KI-en gjorde, hvordan appen ble testet, og skjermbilder.
+Tilbakemeldingene mine er gjengitt i omskrevet og mer formell form, ikke ordrett.
 
 Alle versjonene finnes i koden:
 - **Versjon 1** ligger urørt i mappen [`versjon-1/`](../versjon-1/) og i git-taggen `v1`.
@@ -14,13 +15,12 @@ Alle versjonene finnes i koden:
 
 ## Versjon 1 – første fungerende app
 
-### Idé (min prompt)
+### Idé
 
-> «Balanse»: studie + trening i én ukeplan.
-> Appen kjenner både eksamensdatoene og treningsmålene dine. I rolige uker foreslår den mer trening,
-> men når eksamen nærmer seg, skrur den ned treningsintensiteten og opp lesetiden, uten å kutte trening helt
-> (siden trening faktisk hjelper på stress og konsentrasjon). Du kan også logge søvn/stressnivå,
-> og planen justeres etter det.
+Jeg beskrev ideen slik: «Balanse» skal samle studier og trening i én ukeplan. Appen skal kjenne eksamensdatoer og treningsmål.
+I rolige uker foreslår den mer trening. Når eksamen nærmer seg, reduseres treningsintensiteten og lesetiden økes, uten at
+treningen kuttes helt, siden trening bidrar til lavere stress og bedre konsentrasjon. Det skal også være mulig å logge søvn
+og stressnivå, slik at planen kan justeres etter dette.
 
 ### Hva KI-en gjorde
 
@@ -47,13 +47,11 @@ Alle versjonene finnes i koden:
 
 ## Versjon 2 – lysere design, belønninger og temaer
 
-### Tilbakemelding etter å ha prøvd versjon 1 (mine prompter)
+### Tilbakemelding etter å ha prøvd versjon 1
 
-> appen er for mørk, gi meg noe litt lighetere som motiverere meg til å lese. kansje no form for rewards? steraks?
-
-> og themes man kan velege mellom?
-
-> btw behold første versjon. ta ss av alle sider for å holde logg til innlevering på hvordan første versjon var osv
+- Appen var for mørk. Jeg ønsket et lysere uttrykk som motiverer mer til lesing, gjerne med et belønningssystem og streaks.
+- Jeg ønsket å kunne velge mellom ulike temaer.
+- Første versjon skulle bevares, og det skulle tas skjermbilder av alle sidene, slik at utviklingen kan dokumenteres i innleveringen.
 
 ### Hva KI-en gjorde
 
@@ -95,18 +93,21 @@ Alle versjonene finnes i koden:
 
 ## Versjon 3 – timer, hage og egne treningsøkter
 
-### Tilbakemelding etter å ha prøvd versjon 2 (mine prompter)
+### Tilbakemelding etter å ha prøvd versjon 2
 
-> liker ikke premie systemet fordi det sier meg inegnting lmom jeg er uknuselig. ta inspo fra garden study eller hva enn d heter
-> hvor man låser opp. btw ha en timer for study. ikke bare at man huker av, da er d lett å lyve. så hvis man leser la oss si 45 min
-> i strekk, så vinner man en speisifkkk item som kan brueks til et eller annet. brainstorm ideer på tekst før du bygger noe
+- Belønningssystemet med merker ga lite mening, fordi et merke som «Uknuselig» ikke sier noe om hva jeg faktisk har oppnådd.
+  Jeg ønsket i stedet et system inspirert av studieapper som Forest, der man låser opp ting.
+- Lesing burde registreres med en timer i stedet for avkrysning, siden avkrysning er lett å jukse med. Ved for eksempel
+  45 minutter sammenhengende lesing skulle man vinne en konkret gjenstand som kan brukes til noe.
+- KI-en skulle legge fram forslag i tekst før noe ble bygget.
 
 Først kom KI-en med forslag i tekst, uten å bygge noe: en hage (inspirert av Forest), et studentrom eller et akvarium,
 en tabell over hvilken plante du får for hvor lang økt, ting du kan vinne og hva de brukes til,
-og spørsmålet om hvor streng appen skal være når man går ut av den. Så valgte jeg:
+og spørsmålet om hvor streng appen skal være når man går ut av den. Deretter bestemte jeg følgende:
 
-> hage, snill. trening kan krysses av? eller skal d være detaljert for å ta bort decision fatigue hvor man kan sette inn selv.
-> og redigere upper day osv idk
+- Jeg valgte hagen og en «snill» modus.
+- Når det gjaldt trening, ba jeg om KI-ens vurdering av om avkrysning er nok, eller om treningen burde være mer detaljert,
+  med egne økter som kan redigeres per dag, for å redusere «decision fatigue».
 
 ### Hva KI-en gjorde
 
@@ -158,11 +159,13 @@ og spørsmålet om hvor streng appen skal være når man går ut av den. Så val
 
 ## Versjon 4 – minimalt og moderne design
 
-### Tilbakemelding etter å ha prøvd versjon 3 (min prompt)
+### Tilbakemelding etter å ha prøvd versjon 3
 
-Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
+Jeg la ved et skjermbilde av streak-kortet med den store flammen og ga denne tilbakemeldingen:
 
-> liker ikke dette . dn svære fire greia. gjør appen mer minimal og mer modenrne. fiks emojiene.
+- Det store flammekortet fungerte ikke visuelt.
+- Appen burde få et mer minimalt og moderne uttrykk.
+- Emojiene burde erstattes.
 
 ### Hva KI-en gjorde
 
@@ -205,9 +208,9 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ## Feilretting etter versjon 4 – «Gi opp» virket ikke
 
-### Feilmelding (min prompt)
+### Feilmelding
 
-> det skjer ingenting når ejg trykker på gi opp
+Jeg meldte fra om at ingenting skjedde når jeg trykket på «Gi opp».
 
 ### Hva som var galt
 
@@ -233,10 +236,10 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ## Forbedring – gjenopplive visne planter
 
-### Min prompt
+### Min tilbakemelding
 
-> blir den visnede planten der for alltid? d kan være litt demotiverende. burde kansje få mulighet til åf jerne de
-> enten med poeng eller ved å else de timene som den orginale planten requiara?
+Jeg spurte om visne planter blir stående i hagen for alltid, siden det kan virke demotiverende. Jeg foreslo at man burde kunne
+fjerne dem, enten med poeng eller ved å lese like lenge som den opprinnelige planten krevde.
 
 ### Hva KI-en gjorde
 
@@ -264,16 +267,14 @@ Jeg la ved et skjermbilde av streak-kortet med den store flammen og skrev:
 
 ## Forbedring – én treningsøkt vanner hele hagen
 
-### Mine prompter
+### Min tilbakemelding
 
-> hvorfor r d så mange tørste planter? må man trene mer enn 4x i uka for å catche opp da?
+Jeg spurte hvorfor så mange planter var tørste, og om man måtte trene mer enn fire ganger i uka for å ta igjen plantene.
 
 KI-en forklarte at det var en svakhet i designet. Man fikk én plante per leseøkt (ofte 2–4 om dagen), men bare én vanndråpe
 per treningsdag, og hver dråpe vannet bare én plante. Med 4–5 treninger i uka kunne man aldri ta igjen plantene.
 I eksamensuker ble det verst, fordi appen selv anbefaler mer lesing og lettere trening, så hagen straffet deg for å følge planen.
-KI-en foreslo to løsninger, og jeg valgte:
-
-> treningsøkt som vanner hele hagen
+KI-en foreslo to løsninger, og jeg valgte at én treningsøkt skal vanne hele hagen.
 
 ### Hva KI-en gjorde
 
@@ -294,11 +295,10 @@ KI-en foreslo to løsninger, og jeg valgte:
 
 ## Forbedring – tydeligere ukemål
 
-### Min prompt
+### Min tilbakemelding
 
-Jeg la ved et skjermbilde av oppsummeringskortet («Innspurt · Lesing 22 t 30 min · Trening 2 t 40 min · Økter 1/4») og skrev:
-
-> skjønner ikke denne? hvorfor står d 22t lesing 2t 40 min trening. er d det som har blitt gjort denne uka?
+Jeg la ved et skjermbilde av oppsummeringskortet («Innspurt · Lesing 22 t 30 min · Trening 2 t 40 min · Økter 1/4») og spurte
+hva tallene betydde, og om 22 t 30 min lesing og 2 t 40 min trening var det som allerede var gjort denne uka.
 
 ### Hva som var uklart
 
@@ -323,10 +323,10 @@ sto bare i en liten linje nederst. «Innspurt» ble heller ikke forklart.
 
 ## Forbedring – tryggere sletting og «Innstillinger»
 
-### Min prompt
+### Min tilbakemelding
 
-> x burde ikke være så lett å huke av/slette trening i mål/innstillinger. kan være lett p misclick. mål burde også ha
-> litt tydeligere navn for å vise at man kan endre ting der, siden t.om. theme ligger der.
+- Slettekryssene for treningsøkter under «Mål» var for lette å trykke på ved et uhell.
+- Fanen «Mål» burde få et tydeligere navn som viser at man kan endre innstillinger der, siden den også inneholder blant annet tema.
 
 ### Hva KI-en gjorde
 
@@ -350,15 +350,16 @@ sto bare i en liten linje nederst. «Innspurt» ble heller ikke forklart.
 
 ## Versjon 5 – fag, obliger, påminnelser og dagens oppgaver
 
-### Mine prompter
+### Min tilbakemelding
 
-> burde man også få hjelp til å velge hva man skal else den dagen. at man kan rangere fagene etter vanskelighet/prioritet.
-> kunne legge til frister. kunne legge til dagens studie tasks?
+Jeg ønsket hjelp til å velge hva jeg skal lese hver dag, og foreslo at man skulle kunne:
+- rangere fagene etter vanskelighetsgrad eller prioritet
+- legge inn frister
+- legge inn dagens studieoppgaver
 
 KI-en foreslo først en plan i fire deler før den bygde noe: fag med vanskelighetsgrad og frister, forslag til hva du bør lese i dag,
-dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
-
-> hvert fag bør ha en fane for oblig oppgaver og d3res frister. med påminnelser
+dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til at hvert fag bør ha en egen fane for obligatoriske oppgaver
+og fristene deres, med påminnelser.
 
 ### Hva KI-en gjorde
 
@@ -416,9 +417,9 @@ dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
 
 ## Forbedring – «Levert» som avkrysning
 
-### Min prompt
+### Min tilbakemelding
 
-> levert knappen får d til å virke som jeg HAR levert og ikke som en check knapp
+Jeg påpekte at knappen «Levert» så ut som en status som sier at jeg allerede har levert, og ikke som noe man krysser av.
 
 ### Hva KI-en gjorde
 
@@ -435,13 +436,12 @@ dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
 
 ## Forbedring – egen datovelger
 
-### Mine prompter
+### Min tilbakemelding
 
-> liker ikke datoformatet. ser primittivt ut. få d til å se mer moderne/FINT UT. mener lzm kalenderen som kommer opp
+Jeg syntes nettleserens innebygde datovelger så gammeldags ut, og ba om en mer moderne og pen kalender.
 
-Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjermen:
-
-> omg den kalenderen var SVÆR? samme sizze som istad bare bedre lol
+Det første forsøket var en kalender som gled opp fra bunnen og dekket halve skjermen. Jeg påpekte at den var altfor stor,
+og ba om samme størrelse som den opprinnelige, men med det nye utseendet.
 
 ### Hva KI-en gjorde
 
@@ -473,15 +473,12 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ## Demovideo til innleveringen
 
-### Mine prompter
+### Min tilbakemelding
 
-> oki hvordan skal man levere denne egt
-
-> den sier jo enten vibeoff eller youtube. velg heller vibe
-
-> men oppgaven spør om video?
-
-> vil at du skal ta videoen selv. hvorfor vil du ikke la vibeoff gjøre dette
+- Jeg spurte hvordan appen skulle leveres.
+- Oppgaven gir valget mellom VibeOff og YouTube, og jeg ønsket VibeOff.
+- Jeg påpekte at oppgaven ber om en video.
+- Jeg ba KI-en lage videoen selv, og spurte hvorfor den ikke ville la VibeOff gjøre det.
 
 ### Hva KI-en gjorde
 
@@ -513,25 +510,18 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ### Utkast på VibeOff
 
-> Send utkastet til VibeOff med videoen og skjermbildene. Jeg bekrefter reglene du listet opp.
+Jeg ba KI-en sende et utkast til VibeOff med videoen og skjermbildene, og bekreftet at appen oppfyller VibeOffs regler.
 
 - KI-en lagde et forsidebilde på 1280×800 med tittel, tre telefonskjermer og tre påstander, og registrerte seg som agent hos VibeOff.
 - Den sendte et **utkast**, ikke en publisering, med 7 filer: forsidebildet, demovideoen og 5 skjermbilder med beskrivelser.
   Teksten besto av tittel, sammendrag, hvordan appen ble laget, hva som fungerte, et spørsmål, veien videre og viktigste prompt.
 - Alle bildene ble sjekket for personopplysninger før opplasting. De bruker bare eksempeldata.
-- Jeg ville ikke ha med «28 automatiske tester»:
-
-  > fjerne 28 automatiske etster ingen bryr seg
-
+- Jeg ønsket ikke å ha med påstanden om «28 automatiske tester», fordi den har liten verdi for dem som leser innlegget.
   Utkastet var allerede sendt, og VibeOff endrer utkast på gjennomgangssiden, ikke via et nytt utkast.
   KI-en lagde derfor et nytt forsidebilde ([`vibeoff-forside.png`](vibeoff-forside.png)) med «Trening vanner hele hagen» i stedet,
   og en ny tekst til «Hvordan den ble laget».
-- Jeg ville heller ikke ha med de fem skjermbildene, siden de vises i videoen uansett:
-
-  > fjern de bildene, føler d er litt unødvendig og tar mye plass og de vises i video uansett
-
-  > nei send nytt
-
+- Jeg ønsket heller ikke å ha med de fem skjermbildene, siden de tar mye plass og uansett vises i videoen.
+  Jeg ba KI-en sende et nytt utkast i stedet for å redigere det gamle selv.
   KI-en sendte et nytt utkast (`p-ed6ecfbc`) med bare det nye forsidebildet og videoen, og teksten uten testene.
   Det første utkastet (`p-f92c459c`) ligger fortsatt på samme gjennomgangslenke, men skal ikke publiseres.
 - **Publisert** av meg (brukernavn @meem03, uten ekte navn eller e-post):
@@ -542,13 +532,10 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ## Feilretting – hagen på iPhone
 
-### Mine prompter
+### Min tilbakemelding
 
-Etter at appen ble lagt ut på GitHub Pages, testet jeg den på iPhone og sendte et skjermbilde:
-
-> ehhhh den glitcher litt
-
-> når man gir opp en økt og går til hagen
+Etter at appen ble lagt ut på GitHub Pages, testet jeg den på iPhone. Jeg sendte et skjermbilde som viste at hagen ble vist feil
+når jeg hadde gitt opp en økt og gikk til hagen.
 
 ### Hva som var galt
 
@@ -571,7 +558,7 @@ Chrome, som ble brukt under testingen, viser dette riktig, og derfor ble ikke fe
   Rutenettet holdt seg innenfor skjermen, alle ruter var 60 × 60 px, og siden ble ikke bredere enn 375 px.
 - Underveis gikk en automatisk erstatning i CSS-en galt, og alle kolonnetallene forsvant (`repeat(, …)`). Dette ble oppdaget med en gang
   og rettet med et eget skript som setter inn riktig tall for hvert rutenett.
-- Bekreftet på iPhone etter at rettingen var lagt ut: «funekr bra nå». Hagen holder seg innenfor skjermen.
+- Bekreftet på iPhone etter at rettingen var lagt ut: hagen vises nå riktig og holder seg innenfor skjermen.
 
 ---
 
