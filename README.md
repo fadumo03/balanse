@@ -1,5 +1,7 @@
 # Balanse – studie og trening i én ukeplan
 
+**Prøv appen:** <https://fadumo03.github.io/balanse/> (åpne på mobilen og legg den på hjemskjermen)
+
 **Demo (video):** <https://vibeoff.ai/build/jeg-lagde-en-ukeplan-der-lesing-gror-en-hage-og-trening-ed6ecfbc>
 · Videoen ligger også i repoet: [`dokumentasjon/balanse-demo.webm`](dokumentasjon/balanse-demo.webm)
 
