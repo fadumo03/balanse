@@ -210,6 +210,14 @@ button:active { transform: scale(.98); }
 
 /* ---------- Oppsummering ---------- */
 .summary-head { display: flex; align-items: center; justify-content: space-between; }
+.summary-head h2 { margin: 0; }
+.summary-why { margin: 4px 0 14px; }
+.goal + .goal { margin-top: 12px; }
+.goal-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: .88rem; margin-bottom: 6px; }
+.goal-top > span:first-child { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.goal-top > span:last-child { text-align: right; }
+.goal-top strong { font-weight: 600; }
+.progress.train span { background: var(--train); }
 .summary .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

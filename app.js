@@ -238,34 +238,54 @@
     $("week-title").textContent = `Uke ${isoWeek(currentWeek)}`;
     $("week-range").textContent = `${fmtDate(currentWeek)} – ${fmtDate(end)}`;
 
-    let doneSessions = 0;
-    let plannedSessions = 0;
+    // Ukemål: planlagt for hele uka, og hvor mye som faktisk er gjort.
     let doneStudy = 0;
-    let totalTraining = 0;
+    let plannedTraining = 0;
+    let doneTraining = 0;
+    let plannedSessions = 0;
+    let doneSessions = 0;
     for (const day of week.days) {
       const tr = trainingFor(day);
-      if (tr) totalTraining += tr.minutes;
+      const trained = !!(state.done[day.key] || {}).training;
+      if (tr) {
+        plannedTraining += tr.minutes;
+        if (trained) doneTraining += tr.minutes;
+      }
       if (tr && tr.isSession) {
         plannedSessions++;
-        if ((state.done[day.key] || {}).training) doneSessions++;
+        if (trained) doneSessions++;
       }
       doneStudy += G.studyMinutes(state, day.key);
     }
 
+    const pctOf = (done, planned) => (planned ? Math.min(100, Math.round((done / planned) * 100)) : 0);
+    const upcoming = state.exams
+      .map((x) => ({ ...x, days: B.daysBetween(t, x.date) }))
+      .filter((x) => x.days >= 0)
+      .sort((a, b) => a.days - b.days)[0];
+    let why;
+    if (!upcoming) why = "Ingen eksamener lagt inn";
+    else if (upcoming.days === 0) why = `${escapeHtml(upcoming.subject)} i dag`;
+    else if (upcoming.days === 1) why = `${escapeHtml(upcoming.subject)} i morgen`;
+    else why = `${escapeHtml(upcoming.subject)} om ${upcoming.days} dager`;
+
     const modeClass = { "Rolig uke": "calm", "Eksamensperiode": "mid", "Innspurt": "high" }[week.mode];
-    const pct = week.totalStudy ? Math.min(100, Math.round((doneStudy / week.totalStudy) * 100)) : 0;
     $("week-summary").innerHTML = `
       <div class="summary-head">
+        <h2>Ukemål</h2>
         <span class="badge ${modeClass}">${week.mode}</span>
-        <span class="muted small">${pct} % lest</span>
       </div>
-      <div class="stats">
-        <div><small><span class="dot study"></span>Lesing</small><strong>${fmtMinutes(week.totalStudy)}</strong></div>
-        <div><small><span class="dot train"></span>Trening</small><strong>${fmtMinutes(totalTraining)}</strong></div>
-        <div><small>Økter</small><strong>${doneSessions}/${plannedSessions}</strong></div>
+      <p class="muted small summary-why">${why}. Planen for uka er regnet ut fra eksamenene og søvnen din.</p>
+      <div class="goal">
+        <div class="goal-top"><span><span class="dot study"></span>Lest</span>
+          <span><strong>${fmtMinutes(doneStudy)}</strong> <span class="muted">av ${fmtMinutes(week.totalStudy)}</span></span></div>
+        <div class="progress"><span style="width:${pctOf(doneStudy, week.totalStudy)}%"></span></div>
       </div>
-      <div class="progress" aria-label="Lesetid fullført"><span style="width:${pct}%"></span></div>
-      <small class="muted">${fmtMinutes(doneStudy)} av ${fmtMinutes(week.totalStudy)} lest med timer</small>`;
+      <div class="goal">
+        <div class="goal-top"><span><span class="dot train"></span>Trent</span>
+          <span><strong>${fmtMinutes(doneTraining)}</strong> <span class="muted">av ${fmtMinutes(plannedTraining)} · ${doneSessions} av ${plannedSessions} økter</span></span></div>
+        <div class="progress train"><span style="width:${pctOf(doneTraining, plannedTraining)}%"></span></div>
+      </div>`;
 
     const showPrompt = t >= currentWeek && t <= end && !state.logs[t];
     $("log-prompt").innerHTML = showPrompt

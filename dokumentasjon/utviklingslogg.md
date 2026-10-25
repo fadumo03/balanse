@@ -291,6 +291,35 @@ KI-en foreslo to løsninger, og jeg valgte:
 
 ---
 
+## Forbedring – tydeligere ukemål
+
+### Min prompt
+
+Jeg la ved et skjermbilde av oppsummeringskortet («Innspurt · Lesing 22 t 30 min · Trening 2 t 40 min · Økter 1/4») og skrev:
+
+> skjønner ikke denne? hvorfor står d 22t lesing 2t 40 min trening. er d det som har blitt gjort denne uka?
+
+### Hva som var uklart
+
+De store tallene var det som var **planlagt** for hele uka, ikke det som var gjort. Det du faktisk hadde gjort,
+sto bare i en liten linje nederst. «Innspurt» ble heller ikke forklart.
+
+### Hva KI-en gjorde
+
+- Kortet heter nå **Ukemål** og viser **gjort av planlagt** for både lesing og trening, for eksempel
+  «Lest 8 t 20 min av 22 t 30 min» og «Trent 1 t 5 min av 2 t 40 min · 1 av 4 økter». Hver har sin egen fremdriftslinje.
+- Under tittelen står det hvorfor uka ser slik ut, for eksempel «Matematikk 1 om 5 dager.
+  Planen for uka er regnet ut fra eksamenene og søvnen din».
+
+### Testing
+
+- Kontrollert i nettleseren i mobilstørrelse at tallene stemmer med det som er gjort i eksempeldataene, og at teksten ikke brytes stygt.
+- Alle 20 automatiske tester består.
+
+![Ukemål](skjermbilder/versjon-4/9-ukemaal.jpg)
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*
