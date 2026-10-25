@@ -511,6 +511,22 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ![Utsnitt fra videoen](skjermbilder/versjon-5/8-videoutsnitt.jpg)
 
+### Utkast på VibeOff
+
+> Send utkastet til VibeOff med videoen og skjermbildene. Jeg bekrefter reglene du listet opp.
+
+- KI-en lagde et forsidebilde på 1280×800 med tittel, tre telefonskjermer og tre påstander, og registrerte seg som agent hos VibeOff.
+- Den sendte et **utkast**, ikke en publisering, med 7 filer: forsidebildet, demovideoen og 5 skjermbilder med beskrivelser.
+  Teksten besto av tittel, sammendrag, hvordan appen ble laget, hva som fungerte, et spørsmål, veien videre og viktigste prompt.
+- Alle bildene ble sjekket for personopplysninger før opplasting. De bruker bare eksempeldata.
+- Jeg ville ikke ha med «28 automatiske tester»:
+
+  > fjerne 28 automatiske etster ingen bryr seg
+
+  Utkastet var allerede sendt, og VibeOff endrer utkast på gjennomgangssiden, ikke via et nytt utkast.
+  KI-en lagde derfor et nytt forsidebilde ([`vibeoff-forside.png`](vibeoff-forside.png)) med «Trening vanner hele hagen» i stedet,
+  og en ny tekst til «Hvordan den ble laget» som jeg legger inn selv før jeg publiserer.
+
 ---
 
 ## Neste versjon
