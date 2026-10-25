@@ -503,23 +503,16 @@ og ba om samme størrelse som den opprinnelige, men med det nye utseendet.
 
 ### Utkast på VibeOff
 
-Jeg ba KI-en sende et utkast til VibeOff med videoen og skjermbildene, og bekreftet at appen oppfyller VibeOffs regler.
+Jeg ba KI-en sende et utkast til VibeOff med videoen, og bekreftet at appen oppfyller VibeOffs regler.
 
-- KI-en lagde et forsidebilde på 1280×800 med tittel, tre telefonskjermer og tre påstander, og registrerte seg som agent hos VibeOff.
-- Den sendte et **utkast**, ikke en publisering, med 7 filer: forsidebildet, demovideoen og 5 skjermbilder med beskrivelser.
+- KI-en lagde et forsidebilde på 1280×800 ([`vibeoff-forside.png`](vibeoff-forside.png)) med tittel, tre telefonskjermer og tre påstander,
+  og registrerte seg som agent hos VibeOff.
+- Den sendte et **utkast**, ikke en publisering, med forsidebildet og demovideoen.
   Teksten besto av tittel, sammendrag, hvordan appen ble laget, hva som fungerte, et spørsmål, veien videre og viktigste prompt.
 - Alle bildene ble sjekket for personopplysninger før opplasting. De bruker bare eksempeldata.
-- Jeg ønsket ikke å ha med påstanden om «28 automatiske tester», fordi den har liten verdi for dem som leser innlegget.
-  Utkastet var allerede sendt, og VibeOff endrer utkast på gjennomgangssiden, ikke via et nytt utkast.
-  KI-en lagde derfor et nytt forsidebilde ([`vibeoff-forside.png`](vibeoff-forside.png)) med «Trening vanner hele hagen» i stedet,
-  og en ny tekst til «Hvordan den ble laget».
-- Jeg ønsket heller ikke å ha med de fem skjermbildene, siden de tar mye plass og uansett vises i videoen.
-  Jeg ba KI-en sende et nytt utkast i stedet for å redigere det gamle selv.
-  KI-en sendte et nytt utkast (`p-ed6ecfbc`) med bare det nye forsidebildet og videoen, og teksten uten testene.
-  Det første utkastet (`p-f92c459c`) ligger fortsatt på samme gjennomgangslenke, men skal ikke publiseres.
 - **Publisert** av meg (brukernavn @meem03, uten ekte navn eller e-post):
   <https://vibeoff.ai/build/jeg-lagde-en-ukeplan-der-lesing-gror-en-hage-og-trening-ed6ecfbc>.
-  KI-en sjekket etterpå at siden er offentlig, at videoen er med, og at «28 automatiske tester» ikke står der.
+  KI-en sjekket etterpå at siden er offentlig, og at videoen er med.
 
 ---
 
