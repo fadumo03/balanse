@@ -113,7 +113,8 @@ h3 { font-size: .95rem; margin: 0; font-weight: 600; }
 
 /* ---------- Ikoner ---------- */
 .ico { width: 20px; height: 20px; flex: none; display: block; }
-.art { width: 100%; height: 100%; display: block; }
+/* min-width/max-width: Safari gir ellers SVG-er en innebygd bredde på 300 px, som presser rutenett ut av skjermen */
+.art { width: 100%; height: 100%; min-width: 0; max-width: 100%; display: block; }
 .art.mini { width: 18px; height: 18px; display: inline-block; vertical-align: -4px; }
 
 /* ---------- Topp ---------- */
@@ -186,7 +187,7 @@ button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 }
 
 /* ---------- Nøkkeltall ---------- */
-.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .stat {
   display: flex;
   flex-direction: column;
@@ -221,7 +222,7 @@ button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 .progress.train span { background: var(--train); }
 .summary .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin: 14px 0;
 }
@@ -397,7 +398,7 @@ body.focus-open { overflow: hidden; }
 .focus-inner p { margin: 0; }
 .focus-close { align-self: flex-end; }
 
-.seed-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
+.seed-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
 .seed {
   display: flex;
   flex-direction: column;
@@ -472,7 +473,7 @@ body.focus-open { overflow: hidden; }
 }
 .pill .ico { width: 16px; height: 16px; }
 
-.garden-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.garden-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
 .garden-stats div { display: flex; flex-direction: column; }
 .garden-stats strong { font-size: 1.05rem; font-weight: 600; }
 .garden-stats small { color: var(--muted); font-size: .78rem; }
@@ -492,7 +493,7 @@ body.focus-open { overflow: hidden; }
 .place-hint[hidden] { display: none; }
 .garden-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
   padding: 8px;
   border-radius: var(--radius);
@@ -503,10 +504,16 @@ body.focus-open { overflow: hidden; }
 }
 .tile {
   aspect-ratio: 1;
+  min-width: 0;
+  overflow: hidden;
   border: none;
   border-radius: 12px;
   padding: 6px;
   background: var(--tile);
+}
+/* Eldre Safari uten aspect-ratio: hold rutene kvadratiske med fast høyde */
+@supports not (aspect-ratio: 1) {
+  .tile { height: 17vw; max-height: 96px; }
 }
 .tile.empty { background: var(--tile-empty); }
 .tile.empty.target { outline: 1.5px dashed var(--accent); outline-offset: -3px; }
@@ -540,7 +547,7 @@ body.focus-open { overflow: hidden; }
 .decor-art { width: 38px; height: 38px; flex: none; }
 .decor-item.locked .decor-art { filter: grayscale(1); opacity: .3; }
 
-.catalog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.catalog { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .cat {
   text-align: center;
   padding: 12px 6px 10px;
@@ -580,7 +587,7 @@ body.focus-open { overflow: hidden; }
 }
 
 /* ---------- Temavelger ---------- */
-.themes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.themes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .theme-btn {
   padding: 10px 0 8px;
   display: flex;
@@ -618,7 +625,7 @@ body.focus-open { overflow: hidden; }
 .field input:focus, .tpl-add input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color: var(--accent); }
 
-.segmented { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.segmented { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .segmented button { padding: 9px 0; display: flex; flex-direction: column; align-items: center; font-weight: 600; }
 .segmented small { font-size: .62rem; font-weight: 500; color: var(--muted); }
 .segmented button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
@@ -749,13 +756,13 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
 .diff-2 { background: var(--mid-soft); color: var(--mid); }
 .diff-3 { background: var(--exam-soft); color: var(--exam); }
 
-.segmented.three { grid-template-columns: repeat(3, 1fr); }
+.segmented.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .segmented.three button { font-weight: 500; font-size: .88rem; }
-.segmented.tabs { grid-template-columns: 1fr 1fr; margin-bottom: 12px; background: var(--surface-2); padding: 4px; border-radius: 14px; gap: 4px; }
+.segmented.tabs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-bottom: 12px; background: var(--surface-2); padding: 4px; border-radius: 14px; gap: 4px; }
 .segmented.tabs button { border: none; background: none; border-radius: 10px; font-weight: 500; }
 .segmented.tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 
-.stats-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stats-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .stats-2 strong { display: block; font-size: 1.1rem; font-weight: 600; }
 .stats-2 small { color: var(--muted); font-size: .78rem; }
 .danger-btn, .secondary-btn { width: 100%; margin-bottom: 12px; font-weight: 500; }
@@ -819,7 +826,7 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
 .dp-head strong { font-size: .92rem; font-weight: 600; }
 .dp-head .icon-btn { width: 30px; height: 30px; border-radius: 9px; border-color: transparent; background: var(--surface-2); }
 .dp-head .icon-btn .ico { width: 16px; height: 16px; }
-.dp-week, .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-week, .dp-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
 .dp-week span { text-align: center; font-size: .62rem; font-weight: 600; color: var(--muted); text-transform: uppercase; padding: 3px 0; }
 .dp-day {
   position: relative;
@@ -848,7 +855,7 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
 }
 .dp-day.selected.event::after { background: var(--on-accent); }
 .dp-day:not(.selected):active { background: var(--surface-2); }
-.dp-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.dp-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .dp-quick .chip-btn { padding: 5px 0; font-size: .7rem; white-space: nowrap; border-radius: 8px; }
 .dp-actions { display: flex; justify-content: flex-end; margin-top: 4px; }
 .dp-actions button { padding: 4px 8px; font-size: .78rem; }
@@ -874,7 +881,7 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
   box-shadow: 0 12px 40px rgba(0, 0, 0, .18);
 }
 .dialog-box p { margin: 0 0 18px; font-weight: 500; }
-.dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dialog-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .dialog-ok { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 .dialog-ok.destructive { background: var(--exam); border-color: var(--exam); color: #fff; }
 
@@ -919,7 +926,7 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);

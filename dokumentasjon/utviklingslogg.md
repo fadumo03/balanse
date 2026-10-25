@@ -540,6 +540,41 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ---
 
+## Feilretting – hagen på iPhone
+
+### Mine prompter
+
+Etter at appen ble lagt ut på GitHub Pages, testet jeg den på iPhone og sendte et skjermbilde:
+
+> ehhhh den glitcher litt
+
+> når man gir opp en økt og går til hagen
+
+### Hva som var galt
+
+Hagerutene var for brede, så rutenettet gikk ut over skjermkanten. «Hagen din» ble kuttet til venstre,
+og den nederste raden lå over «Start leseøkt»-knappen. Årsaken var en forskjell i Safari:
+- Kolonner med `1fr` krymper ikke under «naturlig» bredde på innholdet.
+- En SVG-tegning uten fast størrelse får en innebygd bredde på 300 px.
+
+Chrome, som ble brukt under testingen, viser dette riktig, og derfor ble ikke feilen oppdaget før appen ble testet på en ekte iPhone.
+
+### Hva KI-en gjorde
+
+- Alle 15 rutenett i appen bruker nå `minmax(0, 1fr)`, så kolonnene alltid kan krympe til skjermbredden.
+- Plantetegningene og hagerutene kan ikke lenger bli bredere enn kolonnen sin.
+- Eldre Safari uten `aspect-ratio` får en fast rutehøyde, så rutene holder seg kvadratiske.
+
+### Testing
+
+- Feilen kan ikke gjenskapes direkte i Chrome. Derfor ble Safari sin oppførsel simulert ved å gi plantetegningene tvunget bredde på 300 px.
+  Rutenettet holdt seg innenfor skjermen, alle ruter var 60 × 60 px, og siden ble ikke bredere enn 375 px.
+- Underveis gikk en automatisk erstatning i CSS-en galt, og alle kolonnetallene forsvant (`repeat(, …)`). Dette ble oppdaget med en gang
+  og rettet med et eget skript som setter inn riktig tall for hvert rutenett.
+- Bekreftet på iPhone: *(fyll inn når du har testet på nytt)*
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*
