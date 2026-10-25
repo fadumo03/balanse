@@ -571,7 +571,7 @@ Chrome, som ble brukt under testingen, viser dette riktig, og derfor ble ikke fe
   Rutenettet holdt seg innenfor skjermen, alle ruter var 60 × 60 px, og siden ble ikke bredere enn 375 px.
 - Underveis gikk en automatisk erstatning i CSS-en galt, og alle kolonnetallene forsvant (`repeat(, …)`). Dette ble oppdaget med en gang
   og rettet med et eget skript som setter inn riktig tall for hvert rutenett.
-- Bekreftet på iPhone: *(fyll inn når du har testet på nytt)*
+- Bekreftet på iPhone etter at rettingen var lagt ut: «funekr bra nå». Hagen holder seg innenfor skjermen.
 
 ---
 
