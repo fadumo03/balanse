@@ -119,11 +119,13 @@
       <ul id="exam-list" class="list"></ul>
     </section>
 
-    <!-- MÅL -->
-    <section id="view-goals" class="view" aria-label="Mål">
-      <header class="top"><div class="top-title"><p class="eyebrow">Innstillinger</p><h1>Mål</h1></div></header>
-      <p class="lead">Utgangspunktet for en vanlig, rolig uke.</p>
+    <!-- INNSTILLINGER -->
+    <section id="view-goals" class="view" aria-label="Innstillinger">
+      <header class="top"><div class="top-title"><p class="eyebrow">Tilpass appen</p><h1>Innstillinger</h1></div></header>
+      <p class="lead">Endre målene dine, treningsøktene, tema og data.</p>
       <form id="goals-form" class="card">
+        <h2>Mål for uka</h2>
+        <p class="muted small">Utgangspunktet for en vanlig, rolig uke. Appen justerer ut fra eksamener og søvn.</p>
         <label class="field"><span class="field-row">Treningsøkter per uke <strong id="sessions-out">4</strong></span>
           <input type="range" id="goal-sessions" min="1" max="7" step="1">
         </label>
@@ -163,7 +165,7 @@
     <button data-view="log"><span data-icon="moon"></span>Logg</button>
     <button data-view="garden"><span data-icon="sprout"></span>Hage</button>
     <button data-view="exams"><span data-icon="cap"></span>Eksamener</button>
-    <button data-view="goals"><span data-icon="target"></span>Mål</button>
+    <button data-view="goals"><span data-icon="sliders"></span>Innstillinger</button>
   </nav>
 
   <!-- FOKUS-TIMER -->

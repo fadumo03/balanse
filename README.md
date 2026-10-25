@@ -23,7 +23,7 @@ Balanse finner en mellomvei automatisk. Hagen gir deg en ærlig og synlig beløn
 | **Logg** | Logg søvn og stress (1–5) og se en graf for de siste 14 dagene. Påvirker planen og været i hagen. |
 | **Hage** | Alle plantene dine, været, lageret (tørste planter, gjødsel og streak-frys), pynt du kan plassere og en frøkatalog over alle plantene. |
 | **Eksamener** | Legg til og slett eksamener med nedtelling. |
-| **Mål** | Treningsmål, lesetid, dine egne treningsøkter for Hard, Moderat og Lett, 5 temaer og eksempeldata til demo. |
+| **Innstillinger** | Mål for uka (trening og lesetid), dine egne treningsøkter for Hard, Moderat og Lett, 5 temaer og eksempeldata til demo. Sletting må bekreftes, så du ikke sletter noe ved et uhell. |
 
 ### Leseøkt med timer
 

@@ -818,12 +818,18 @@
   $("exam-list").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-delete]");
     if (!btn) return;
-    state.exams = state.exams.filter((x) => x.id !== btn.dataset.delete);
-    save();
-    renderExams();
+    const exam = state.exams.find((x) => x.id === btn.dataset.delete);
+    if (!exam) return;
+    ask(`Slette eksamenen i ${exam.subject} (${fmtDate(exam.date)})?`, "Slett").then((ok) => {
+      if (!ok) return;
+      state.exams = state.exams.filter((x) => x.id !== exam.id);
+      save();
+      renderExams();
+      toast("Eksamenen er slettet.");
+    });
   });
 
-  // ---------- Mål ----------
+  // ---------- Innstillinger ----------
   const goalInputs = [
     ["goal-sessions", "sessionsPerWeek", "sessions-out", (v) => String(v)],
     ["goal-minutes", "sessionMinutes", "minutes-out", (v) => `${v} min`],
@@ -872,9 +878,14 @@
     const del = e.target.closest("[data-tpl-del]");
     if (!del) return;
     const [lvl, i] = del.dataset.tplDel.split(":").map(Number);
-    state.templates[lvl].splice(i, 1);
-    save();
-    renderTemplates();
+    const text = state.templates[lvl][i];
+    ask(`Slette «${text}» fra ${B.ACTIVITIES[lvl].label}?`, "Slett").then((ok) => {
+      if (!ok || state.templates[lvl][i] !== text) return;
+      state.templates[lvl].splice(i, 1);
+      save();
+      renderTemplates();
+      toast("Økta er slettet.");
+    });
   });
   $("templates").addEventListener("submit", (e) => {
     e.preventDefault();

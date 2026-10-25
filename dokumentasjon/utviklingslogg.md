@@ -320,6 +320,33 @@ sto bare i en liten linje nederst. «Innspurt» ble heller ikke forklart.
 
 ---
 
+## Forbedring – tryggere sletting og «Innstillinger»
+
+### Min prompt
+
+> x burde ikke være så lett å huke av/slette trening i mål/innstillinger. kan være lett p misclick. mål burde også ha
+> litt tydeligere navn for å vise at man kan endre ting der, siden t.om. theme ligger der.
+
+### Hva KI-en gjorde
+
+- **Sletting må bekreftes.** Trykker du × på en treningsøkt, kommer dialogen «Slette "Yoga" fra Lett?» med «Avbryt» og en rød «Slett».
+  Eksamenslisten hadde den samme lille ×-knappen og fikk samme bekreftelse, for eksempel «Slette eksamenen i Matematikk 1 (30. okt)?».
+  Etter sletting kommer en kort bekreftelse nederst på skjermen.
+- **«Mål» heter nå «Innstillinger».** Fanen har et ikon med skyveknapper, og siden har overskriften «Tilpass appen / Innstillinger».
+  Den er delt i tydelige deler: *Mål for uka*, *Mine treningsøkter*, *Tema* og *Data*.
+
+### Testing
+
+- Testet i mobilstørrelse:
+  - «Avbryt» lar treningsøkta være, og «Slett» fjerner den.
+  - Eksamenslisten spør før den sletter.
+  - «Innstillinger» får plass i fanemenyen.
+- Under testingen ble det oppdaget at én treningsøkt allerede manglet i Hard-listen. Den var sannsynligvis slettet ved et uhell tidligere,
+  noe som viser at endringen var nødvendig.
+- Alle 20 automatiske tester består.
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*
