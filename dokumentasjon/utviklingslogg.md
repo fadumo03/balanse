@@ -473,13 +473,6 @@ og ba om samme størrelse som den opprinnelige, men med det nye utseendet.
 
 ## Demovideo til innleveringen
 
-### Min tilbakemelding
-
-- Jeg spurte hvordan appen skulle leveres.
-- Oppgaven gir valget mellom VibeOff og YouTube, og jeg ønsket VibeOff.
-- Jeg påpekte at oppgaven ber om en video.
-- Jeg ba KI-en lage videoen selv, og spurte hvorfor den ikke ville la VibeOff gjøre det.
-
 ### Hva KI-en gjorde
 
 - KI-en leste instruksjonene til VibeOff. VibeOff lager videoen ved å la agenten laste ned og kjøre et skript fra nettsiden deres.
