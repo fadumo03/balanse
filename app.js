@@ -254,6 +254,12 @@
     toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
   }
 
+  // Fjern en melding som ikke lenger stemmer (f.eks. «Planten lever fortsatt» når økta nettopp er avsluttet).
+  function hideToast() {
+    clearTimeout(toastTimer);
+    $("toast").classList.remove("show");
+  }
+
   function confetti(count) {
     const box = $("confetti");
     box.innerHTML = "";
@@ -879,6 +885,7 @@
   function finish() {
     const a = state.active;
     clearInterval(tickTimer);
+    hideToast();
     const end = a.start + a.minutes * 60000;
     const events = G.completeSession(state, a, Math.min(Date.now(), end), B.examsOf(state.subjects));
     state.active = null;
@@ -913,6 +920,7 @@
     const a = state.active;
     const wasRevive = !!a.revive;
     clearInterval(tickTimer);
+    hideToast();
     G.witherSession(state, a, Date.now());
     state.active = null;
     save();

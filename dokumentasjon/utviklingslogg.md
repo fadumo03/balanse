@@ -471,6 +471,48 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
 ---
 
+## Demovideo til innleveringen
+
+### Mine prompter
+
+> oki hvordan skal man levere denne egt
+
+> den sier jo enten vibeoff eller youtube. velg heller vibe
+
+> men oppgaven spør om video?
+
+> vil at du skal ta videoen selv. hvorfor vil du ikke la vibeoff gjøre dette
+
+### Hva KI-en gjorde
+
+- KI-en leste instruksjonene til VibeOff. VibeOff lager videoen ved å la agenten laste ned og kjøre et skript fra nettsiden deres.
+  KI-en kjører ikke programmer fra ukjente kilder på maskinen min, så den lagde videoen selv i stedet.
+- **Fremgangsmåte:**
+  1. Dataene mine ble sikkerhetskopiert, og eksempeldata ble lastet inn.
+  2. KI-en gikk gjennom appen i mobilstørrelse og tok 12 skjermbilder: ukeplan, dagens fag og oppgaver, fag, obliger, datovelger,
+     velg plante, timer, fullført økt, gi opp, vissen plante, tørste planter og hagen etter trening.
+  3. En liten nettside ([`demovideo/lag-video.html`](demovideo/lag-video.html)) tegner hver scene med telefonen til høyre og en
+     forklaring til venstre. Den koder videoen med nettleserens innebygde videokoder (WebCodecs, VP8) og pakker den som WebM.
+  4. Dataene mine ble lagt tilbake etterpå.
+- **Resultat:** [`balanse-demo.webm`](balanse-demo.webm), 47 sekunder, 1280×720 og 2,7 MB. Den passer både for YouTube
+  og for VibeOff-grensen på 8 MB.
+
+### Problemer underveis
+
+- **Første forsøk ble feil.** Det tok opp lerretet i sanntid (MediaRecorder). Nettleserpanelet tegnet ikke siden mens Claude-vinduet
+  lå bak et annet vindu, så videoen ble 47 sekunder lang med bare to ulike bilder.
+  Dette ble oppdaget ved å sammenligne bilder fra ulike tidspunkter i videoen.
+  Løsningen var å kode hvert bilde direkte med faste tidsstempler, så resultatet ikke er avhengig av at skjermen tegnes.
+- **Kontroll:** Videobildene ble dekodet igjen og sammenlignet (22 ulike bilder fra 35 nøkkelbilder). Et utsnitt av scenene ble
+  lagret som bilde og sjekket.
+- **Feil i appen funnet under opptaket:** Meldingen «Velkommen tilbake. Planten lever fortsatt.» ble liggende på skjermen samtidig
+  som det sto «Planten visnet». Nå fjernes gamle meldinger når en økt avsluttes.
+- **Layout i videoen:** Avstanden mellom tittel og tekst ble for stor når tittelen fikk plass på én linje. Teksten plasseres nå rett under tittelen.
+
+![Utsnitt fra videoen](skjermbilder/versjon-5/8-videoutsnitt.jpg)
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*

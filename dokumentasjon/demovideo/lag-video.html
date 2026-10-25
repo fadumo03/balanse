@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<title>Balanse – demovideo</title>
+<style>
+  body { margin: 0; background: #ddd; font: 14px system-ui, sans-serif; }
+  canvas { display: block; width: 640px; height: 360px; margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  #status { margin: 0 12px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1280" height="720"></canvas>
+<p id="status">Laster bilder…</p>
+<script>
+// Setter skjermbildene sammen til en video (WebM) med tekst ved siden av telefonen.
+const W = 1280, H = 720;
+const ACCENT = "#1f8a70", TEXT = "#161a18", MUTED = "#5f6a64";
+const SCENES = [
+  ["Planen for uka", "Frister vises øverst, og ukemålet viser hvor mye du har lest og trent av det som er planlagt."],
+  ["Hva skal jeg lese i dag?", "Dagens lesetid fordeles på fagene ut fra vanskelighetsgrad og frister. Dagens oppgaver er en sjekkliste."],
+  ["Fagene dine", "Hvert fag har vanskelighetsgrad, eksamensdato og obliger."],
+  ["Obliger med påminnelser", "Frist, påminnelse, avkrysning når den er levert, og «Legg i kalender»."],
+  ["Egen datovelger", "En liten kalender med prikker på dager som allerede har eksamen eller frist."],
+  ["Les med timer", "Velg plante etter hvor lenge du vil lese i strekk, og hvilket fag du leser."],
+  ["Planten gror mens du leser", "Skjermen holdes på. Du kan være borte fra appen i inntil 2 minutter."],
+  ["45 minutter i strekk!", "Planten havner i hagen, og du kan vinne ting som streak-frys og pynt."],
+  ["Gir du opp …", "… må du bekrefte det. Da teller ikke økta."],
+  ["… visner planten", "Men den kan gjenopplives ved å lese like lenge som planten krevde."],
+  ["Hagen din", "Grå planter er tørste. Været i hagen følger søvnloggen."],
+  ["Trening vanner hele hagen", "Én treningsøkt, og alle tørste planter blomstrer."]
+];
+const HOLD = 3400, TITLE_HOLD = 3200, END_HOLD = 3200;
+
+const c = document.getElementById("c");
+const ctx = c.getContext("2d");
+const status = (t) => { document.getElementById("status").textContent = t; };
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function background() {
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "#f7f8f7");
+  g.addColorStop(1, "#e2f1ea");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function wrap(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line, x, y);
+      line = word;
+      y += lineHeight;
+    } else line = test;
+  }
+  ctx.fillText(line, x, y);
+  return y; // y for siste linje
+}
+
+function phone(img) {
+  const h = 650, w = Math.round(h * img.width / img.height);
+  const x = 1280 - 140 - w, y = (H - h) / 2;
+  ctx.save();
+  ctx.shadowColor = "rgba(20, 40, 30, .25)";
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 12;
+  roundRect(x - 10, y - 10, w + 20, h + 20, 44);
+  ctx.fillStyle = "#1b1f24";
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  roundRect(x, y, w, h, 34);
+  ctx.clip();
+  ctx.drawImage(img, x, y, w, h);
+  ctx.restore();
+}
+
+function scene(img, index, title, text) {
+  background();
+  phone(img);
+  ctx.fillStyle = ACCENT;
+  ctx.font = "600 22px system-ui, sans-serif";
+  ctx.fillText(`${index} / ${SCENES.length}`, 110, 250);
+  ctx.fillStyle = TEXT;
+  ctx.font = "700 50px system-ui, sans-serif";
+  const lastTitleY = wrap(title, 110, 320, 560, 60);
+  ctx.fillStyle = MUTED;
+  ctx.font = "400 27px system-ui, sans-serif";
+  wrap(text, 110, lastTitleY + 62, 540, 40);
+  // fremdriftslinje nederst
+  ctx.fillStyle = "rgba(31, 138, 112, .15)";
+  ctx.fillRect(110, 640, 540, 6);
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(110, 640, 540 * index / SCENES.length, 6);
+}
+
+function card(icon, title, lines) {
+  background();
+  if (icon) {
+    ctx.save();
+    roundRect(W / 2 - 60, 170, 120, 120, 28);
+    ctx.clip();
+    ctx.drawImage(icon, W / 2 - 60, 170, 120, 120);
+    ctx.restore();
+  }
+  ctx.textAlign = "center";
+  ctx.fillStyle = TEXT;
+  ctx.font = "700 72px system-ui, sans-serif";
+  ctx.fillText(title, W / 2, 380);
+  ctx.fillStyle = MUTED;
+  ctx.font = "400 30px system-ui, sans-serif";
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, 440 + i * 46));
+  ctx.textAlign = "left";
+}
+
+// ---------- Minimal WebM-pakker (EBML/Matroska) ----------
+// Videobildene kodes med WebCodecs (VP8) med faste tidsstempler, så videoen blir riktig
+// selv om nettleservinduet ikke tegnes mens den lages.
+const enc = new TextEncoder();
+function sizeBytes(n) {
+  let len = 1;
+  while (n >= 2 ** (7 * len) - 1) len++;
+  const out = new Uint8Array(len);
+  let v = n;
+  for (let i = len - 1; i >= 0; i--) { out[i] = v & 0xff; v = Math.floor(v / 256); }
+  out[0] |= 1 << (8 - len);
+  return out;
+}
+function uintBytes(n) {
+  const out = [];
+  do { out.unshift(n & 0xff); n = Math.floor(n / 256); } while (n > 0);
+  return new Uint8Array(out);
+}
+function idBytes(id) { return uintBytes(id); }
+function concat(parts) {
+  const len = parts.reduce((s, p) => s + p.length, 0);
+  const out = new Uint8Array(len);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+function el(id, data) {
+  const body = data instanceof Uint8Array ? data : concat(data);
+  return concat([idBytes(id), sizeBytes(body.length), body]);
+}
+const u = (id, n) => el(id, uintBytes(n));
+const s = (id, str) => el(id, enc.encode(str));
+function f64(id, x) { const b = new Uint8Array(8); new DataView(b.buffer).setFloat64(0, x); return el(id, b); }
+
+function buildWebM(chunks, width, height, durationMs) {
+  const header = el(0x1A45DFA3, [u(0x4286, 1), u(0x42F7, 1), u(0x42F2, 4), u(0x42F3, 8), s(0x4282, "webm"), u(0x4287, 2), u(0x4285, 2)]);
+  const info = el(0x1549A966, [u(0x2AD7B1, 1000000), f64(0x4489, durationMs), s(0x4D80, "Balanse"), s(0x5741, "Balanse")]);
+  const tracks = el(0x1654AE6B, [el(0xAE, [u(0xD7, 1), u(0x73C5, 1), u(0x83, 1), s(0x86, "V_VP8"), el(0xE0, [u(0xB0, width), u(0xBA, height)])])]);
+  // Ny cluster ved hvert nøkkelbilde
+  const clusters = [];
+  let current = null;
+  for (const ch of chunks) {
+    const ms = Math.round(ch.timestamp / 1000);
+    if (!current || ch.key) {
+      if (current) clusters.push(el(0x1F43B675, current.parts));
+      current = { start: ms, parts: [u(0xE7, ms)] };
+    }
+    const rel = ms - current.start;
+    const head = new Uint8Array([0x81, (rel >> 8) & 0xff, rel & 0xff, ch.key ? 0x80 : 0x00]);
+    current.parts.push(el(0xA3, concat([head, ch.data])));
+  }
+  if (current) clusters.push(el(0x1F43B675, current.parts));
+  const segment = el(0x18538067, [info, tracks, ...clusters]);
+  return new Blob([header, segment], { type: "video/webm" });
+}
+
+async function record() {
+  const icon = await loadImage("icon.png");
+  const imgs = [];
+  for (let i = 1; i <= SCENES.length; i++) imgs.push(await loadImage(`frames/${String(i).padStart(2, "0")}.jpg`));
+
+  const FPS = 10;
+  const chunks = [];
+  const encoder = new VideoEncoder({
+    output: (chunk) => {
+      const data = new Uint8Array(chunk.byteLength);
+      chunk.copyTo(data);
+      chunks.push({ timestamp: chunk.timestamp, key: chunk.type === "key", data });
+    },
+    error: (e) => { window.__error = String(e); }
+  });
+  encoder.configure({ codec: "vp8", width: W, height: H, bitrate: 1_500_000, framerate: FPS });
+
+  let frameNo = 0;
+  async function hold(ms) {
+    const n = Math.round((ms / 1000) * FPS);
+    for (let i = 0; i < n; i++) {
+      const frame = new VideoFrame(c, { timestamp: Math.round((frameNo * 1e6) / FPS), duration: Math.round(1e6 / FPS) });
+      encoder.encode(frame, { keyFrame: i === 0 || frameNo % (FPS * 2) === 0 });
+      frame.close();
+      frameNo++;
+      if (encoder.encodeQueueSize > 8) await wait(10);
+    }
+  }
+
+  status("Lager video: tittel");
+  card(icon, "Balanse", ["Studie og trening i én ukeplan", "Laget med vibe coding i Claude Code"]);
+  await hold(TITLE_HOLD);
+  for (let i = 0; i < SCENES.length; i++) {
+    status(`Lager video: ${i + 1} / ${SCENES.length}`);
+    scene(imgs[i], i + 1, SCENES[i][0], SCENES[i][1]);
+    await hold(HOLD);
+  }
+  card(icon, "Balanse", ["Les med timer. Tren for å vanne hagen.", "Laget med vibe coding i Claude Code"]);
+  await hold(END_HOLD);
+  await encoder.flush();
+  encoder.close();
+  window.__chunks = chunks; // til kontroll av innholdet
+  const type = "video/webm (VP8, WebCodecs)";
+
+  const blob = buildWebM(chunks, W, H, (frameNo * 1000) / FPS);
+  status(`Laster opp ${(blob.size / 1e6).toFixed(1)} MB …`);
+  const res = await fetch("/upload", { method: "POST", body: blob });
+  const msg = await res.text();
+  status(`Ferdig: ${msg}`);
+  window.__result = { size: blob.size, type, msg };
+  return window.__result;
+}
+
+window.__record = record;
+status("Klar. Kall __record() for å starte.");
+</script>
+</body>
+</html>
