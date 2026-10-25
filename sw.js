@@ -1,5 +1,5 @@
 // Enkel service worker slik at appen åpner uten nett etter første besøk.
-const CACHE = "balanse-v5";
+const CACHE = "balanse-v6";
 const FILES = ["./", "index.html", "style.css", "icons.js", "plan.js", "garden.js", "app.js", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (event) => {

@@ -145,6 +145,7 @@ button {
   padding: 10px 14px;
 }
 button:active { transform: scale(.98); }
+button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
 .icon-btn {
   width: 40px;
@@ -644,6 +645,140 @@ input[type=range] { display: block; width: 100%; margin-top: 10px; accent-color:
 .exam-item > div { flex: 1; display: flex; flex-direction: column; }
 .exam-item.past { opacity: .55; }
 .empty { color: var(--muted); text-align: center; }
+
+/* ---------- Frister (påminnelser) ---------- */
+.reminders h2 { display: flex; align-items: center; gap: 8px; }
+.h-ico { color: var(--exam); display: grid; }
+.h-ico .ico { width: 18px; height: 18px; }
+.reminder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.reminder-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0;
+  border: none;
+  background: none;
+}
+.reminder-text strong { font-weight: 600; font-size: .92rem; }
+.reminder-text small { color: var(--muted); font-size: .78rem; }
+.reminder.late .chip { background: var(--exam); color: #fff; }
+
+/* ---------- Forslag til fag og dagens oppgaver ---------- */
+.study-task.has-suggest { border-bottom: none; padding-bottom: 2px; }
+.suggest-wrap { padding: 0 0 12px 20px; border-bottom: 1px solid var(--border); }
+.suggest { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.suggest li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.suggest-text { flex: 1; min-width: 0; font-size: .88rem; }
+.suggest-text small { display: block; color: var(--muted); font-size: .76rem; }
+.link-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: .85rem;
+  font-weight: 500;
+  text-align: left;
+}
+.link-btn .ico { width: 15px; height: 15px; }
+
+.tasks { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.tasks-title { margin: 0 0 6px; font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.task-list { list-style: none; margin: 0; padding: 0; }
+.task-list li { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.task-list input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; margin: 0; }
+.task-label { flex: 1; min-width: 0; font-size: .9rem; }
+.task-label small { display: block; color: var(--muted); font-size: .75rem; }
+.task-list li.checked .task-label { color: var(--muted); text-decoration: line-through; }
+.task-add { display: flex; gap: 6px; margin-top: 6px; }
+.task-add input, .task-add select {
+  min-width: 0;
+  padding: 7px 9px;
+  font: inherit;
+  font-size: .85rem;
+  color: inherit;
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+.task-add input { flex: 1; }
+.task-add select { max-width: 96px; }
+
+/* ---------- Fag i timeren ---------- */
+.pick-label { margin: 4px 0 6px; font-size: .85rem; font-weight: 600; text-align: center; }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.chip-btn { padding: 7px 12px; border-radius: 999px; font-size: .85rem; }
+.chip-btn.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+
+/* ---------- Fag ---------- */
+.list > li { list-style: none; }
+.subject-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.subject-item > .ico { color: var(--muted); width: 18px; height: 18px; }
+.subject-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.subject-main strong { font-weight: 600; }
+.subject-main small { color: var(--muted); font-size: .78rem; }
+.diff { font-size: .72rem; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.diff-1 { background: var(--accent-soft); color: var(--accent); }
+.diff-2 { background: var(--mid-soft); color: var(--mid); }
+.diff-3 { background: var(--exam-soft); color: var(--exam); }
+
+.segmented.three { grid-template-columns: repeat(3, 1fr); }
+.segmented.three button { font-weight: 500; font-size: .88rem; }
+.segmented.tabs { grid-template-columns: 1fr 1fr; margin-bottom: 12px; background: var(--surface-2); padding: 4px; border-radius: 14px; gap: 4px; }
+.segmented.tabs button { border: none; background: none; border-radius: 10px; font-weight: 500; }
+.segmented.tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+
+.stats-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stats-2 strong { display: block; font-size: 1.1rem; font-weight: 600; }
+.stats-2 small { color: var(--muted); font-size: .78rem; }
+.danger-btn, .secondary-btn { width: 100%; margin-bottom: 12px; font-weight: 500; }
+.danger-btn { color: var(--exam); }
+
+.oblig-top { display: flex; align-items: center; gap: 10px; }
+.oblig-top input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; margin: 0; }
+.oblig-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.oblig-text strong { font-weight: 600; }
+.oblig-text small { color: var(--muted); font-size: .78rem; }
+.oblig.done .oblig-text strong { text-decoration: line-through; color: var(--muted); }
+.oblig.late { border-color: var(--exam); }
+.oblig-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-left: 30px; flex-wrap: wrap; }
+.oblig.done .oblig-actions { margin-top: 0; justify-content: flex-end; }
+.remind { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); margin-right: auto; }
+.remind select, .field select {
+  font: inherit;
+  font-size: .82rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: none;
+  border-radius: 8px;
+  padding: 5px 6px;
+}
+.field select { display: block; margin-top: 6px; padding: 10px 12px; font-size: .9rem; width: 100%; }
 
 /* ---------- Bekreftelse ---------- */
 .dialog {

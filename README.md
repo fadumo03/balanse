@@ -19,10 +19,10 @@ Balanse finner en mellomvei automatisk. Hagen gir deg en ærlig og synlig beløn
 
 | Fane | Hva den gjør |
 |---|---|
-| **Uke** | Ukeplan dag for dag. Lesing startes med «▶ Les nå» og fylles av timer-tid. Trening hentes fra dine egne økter, kan byttes per dag og krysses av. «Hvorfor?» forklarer hver anbefaling. Streak-kortet viser hvor mange dager på rad du har lest. |
+| **Uke** | Ukeplan dag for dag med frister øverst. Lesing startes med «Les» og fylles av timer-tid. Dagens lesetid fordeles på de viktigste fagene, og dagens oppgaver er en sjekkliste der uferdige oppgaver flytter seg til neste dag. Trening hentes fra dine egne økter, kan byttes per dag og krysses av. «Hvorfor?» forklarer hver anbefaling. |
+| **Fag** | Fagene dine med vanskelighetsgrad og eksamensdato. Hvert fag har fanene *Oversikt* og *Obliger*. Under *Obliger* legger du inn frister med påminnelse og kan legge dem i kalenderen. |
 | **Logg** | Logg søvn og stress (1–5) og se en graf for de siste 14 dagene. Påvirker planen og været i hagen. |
 | **Hage** | Alle plantene dine, været, lageret (tørste planter, gjødsel og streak-frys), pynt du kan plassere og en frøkatalog over alle plantene. |
-| **Eksamener** | Legg til og slett eksamener med nedtelling. |
 | **Innstillinger** | Mål for uka (trening og lesetid), dine egne treningsøkter for Hard, Moderat og Lett, 5 temaer og eksempeldata til demo. Sletting må bekreftes, så du ikke sletter noe ved et uhell. |
 
 ### Leseøkt med timer
@@ -55,7 +55,10 @@ så blir den til den opprinnelige planten igjen i samme rute.
 3. **Trening**: økter fordeles jevnt utover uka. Intensiteten blir *Hard* når presset er under 0,3,
    *Moderat* når det er under 0,7, og ellers *Lett*. Selve økta hentes fra listene dine. På dager med høyt press
    uten planlagt økt legges det inn en kort gåtur som aktiv pause.
-4. **Overskudd** fra søvn og stress (snitt av de tre siste loggede dagene). Er overskuddet lavt, går treningen ned ett hakk,
+4. **Frister** (obliger) teller som eksamener, men med vekt 0,6. Når fristen nærmer seg, gir det mer lesetid.
+5. **Fagforslag:** dagens lesetid fordeles på 1–3 fag. Poengsummen for et fag er vanskelighetsgrad × (0,25 + hvor nær eksamen eller frist er).
+   Vanskelighetsgradene teller 1, 1,5 og 2. Minuttene fordeles i forhold til poengsummen og rundes til 15 minutter.
+6. **Overskudd** fra søvn og stress (snitt av de tre siste loggede dagene). Er overskuddet lavt, går treningen ned ett hakk,
    lesetiden ned 15 %, og du får et søvntips.
 
 Planlogikken ligger i [`plan.js`](plan.js) og hagelogikken (timer, planter, ting og streak) i [`garden.js`](garden.js).
@@ -75,16 +78,18 @@ Alle ikoner og illustrasjoner er egne SVG-tegninger i [`icons.js`](icons.js), sl
 python -m http.server 8080
 ```
 
-Åpne deretter <http://localhost:8080>. Tidligere versjoner ligger på `/versjon-1/`, `/versjon-2/` og `/versjon-3/`.
+Åpne deretter <http://localhost:8080>. Tidligere versjoner ligger på `/versjon-1/` til `/versjon-4/`.
 
 ## Tester
 
 ```bash
-node --test tests/plan.test.js tests/garden.test.js
+node --test tests/plan.test.js tests/garden.test.js tests/subjects.test.js
 ```
 
-De 20 testene sjekker planen (eksamenspress, trening som aldri forsvinner, søvn og stress, datoer over sommertid)
-og hagen (timer og visning, gjenoppliving, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler).
+De 28 testene sjekker:
+- **planen:** eksamenspress, trening som aldri forsvinner, søvn og stress, og datoer over sommertid
+- **hagen:** timer og visning, gjenoppliving, planter, gjødsel, streak-frys, eksamensblomst, vann, pynt, vær og treningsmaler
+- **fagene:** fagforslag, frister i planen, påminnelser, kalenderfil og dagens oppgaver
 
 ## Legge appen på telefonen
 
@@ -104,5 +109,8 @@ Hele prosessen, med promptene mine, hva som ble endret, testing og skjermbilder 
 3. **Versjon 3** ([`versjon-3/`](versjon-3/)): Merkene sa meg ingenting, og avkrysning var lett å jukse med. Jeg ba KI-en brainstorme først.
    Så valgte jeg en hage med timer (inspirert av Forest) i snill modus, ting man vinner og kan bruke, og egne treningsøkter
    for å slippe «decision fatigue». Under testingen ble fem feil funnet og rettet.
-4. **Versjon 4**: Det store flammekortet og emojiene føltes barnslige. Appen fikk et minimalt og moderne design
-   med egne tegnede ikoner og planteillustrasjoner. Under testingen ble fire feil funnet og rettet.
+4. **Versjon 4** ([`versjon-4/`](versjon-4/)): Det store flammekortet og emojiene føltes barnslige. Appen fikk et minimalt og moderne design
+   med egne tegnede ikoner og planteillustrasjoner. Etterpå kom flere forbedringer etter testing: «Gi opp» ble reparert, visne planter
+   kan gjenopplives, én treningsøkt vanner hele hagen, ukemålet ble tydeligere, sletting må bekreftes, og «Mål» heter nå «Innstillinger».
+5. **Versjon 5**: Jeg ville ha hjelp til å velge hva jeg skal lese. Appen fikk fag med vanskelighetsgrad, obliger med frister og påminnelser,
+   forslag til dagens fag og en sjekkliste for dagens oppgaver.

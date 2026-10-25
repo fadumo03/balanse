@@ -7,7 +7,8 @@ Alle versjonene finnes i koden:
 - **Versjon 1** ligger urørt i mappen [`versjon-1/`](../versjon-1/) og i git-taggen `v1`.
 - **Versjon 2** ligger urørt i mappen [`versjon-2/`](../versjon-2/) og i git-taggen `v2`.
 - **Versjon 3** ligger urørt i mappen [`versjon-3/`](../versjon-3/) og i git-taggen `v3`.
-- **Versjon 4** er hovedappen i rotmappen (git-taggen `v4`).
+- **Versjon 4** ligger i mappen [`versjon-4/`](../versjon-4/), med forbedringene som kom etter v4, og i git-taggen `v4`.
+- **Versjon 5** er hovedappen i rotmappen (git-taggen `v5`).
 
 ---
 
@@ -344,6 +345,72 @@ sto bare i en liten linje nederst. «Innspurt» ble heller ikke forklart.
 - Under testingen ble det oppdaget at én treningsøkt allerede manglet i Hard-listen. Den var sannsynligvis slettet ved et uhell tidligere,
   noe som viser at endringen var nødvendig.
 - Alle 20 automatiske tester består.
+
+---
+
+## Versjon 5 – fag, obliger, påminnelser og dagens oppgaver
+
+### Mine prompter
+
+> burde man også få hjelp til å velge hva man skal else den dagen. at man kan rangere fagene etter vanskelighet/prioritet.
+> kunne legge til frister. kunne legge til dagens studie tasks?
+
+KI-en foreslo først en plan i fire deler før den bygde noe: fag med vanskelighetsgrad og frister, forslag til hva du bør lese i dag,
+dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
+
+> hvert fag bør ha en fane for oblig oppgaver og d3res frister. med påminnelser
+
+### Hva KI-en gjorde
+
+- **«Eksamener» ble «Fag».** Hvert fag har navn, vanskelighetsgrad (lett, middels eller vanskelig) og eksamensdato.
+  Eksamener som var lagt inn fra før, ble automatisk gjort om til fag, så ingenting gikk tapt.
+- **Hvert fag har sin egen side med to faner:**
+  - *Oversikt*: lesetid denne uka og totalt, vanskelighetsgrad, eksamensdato og navn.
+  - *Obliger*: oppgaver med frist, påminnelse (samme dag, 1 dag, 3 dager eller 1 uke før), «Levert»-avkrysning og «Legg i kalender».
+- **Hva skal jeg lese i dag?** Dagens lesetid fordeles på de 1–3 viktigste fagene ut fra vanskelighetsgrad og hvor nær eksamen
+  eller frist er, for eksempel «Matematikk 1 · 1 t 45 min · eksamen om 5 dager». Hvert fag har en «Les»-knapp som starter timeren med det faget.
+- **Frister påvirker planen.** En oblig gir mer lesetid når fristen nærmer seg, men teller litt mindre enn en eksamen.
+- **Påminnelser på tre måter:**
+  1. Et «Frister»-kort øverst i ukeplanen når en frist er innenfor påminnelsen eller på overtid, med «Levert»-knapp.
+  2. Varsel på telefonen når du åpner appen, hvis du slår det på under Innstillinger.
+  3. «Legg i kalender» lager en kalenderfil med alarm, så telefonen varsler selv når appen er lukket.
+     En web-app uten server kan ikke sende varsler mens den er lukket, så dette var den sikreste løsningen.
+- **Dagens oppgaver:** en sjekkliste på dagens kort, der hver oppgave kan knyttes til et fag. Uferdige oppgaver flytter seg
+  automatisk til neste dag og merkes «fra i går».
+- **Timeren vet hvilket fag du leser.** Det foreslåtte faget er valgt på forhånd og kan byttes. Lesetiden telles per fag.
+- Versjon 4 ble tatt vare på i `versjon-4/`.
+
+### Testing og forbedringer
+
+- **8 nye automatiske tester**, så nå er det 28 som alle består. De sjekker:
+  - at lesetiden fordeles på riktige fag og summerer riktig
+  - at en frist løfter faget
+  - at ferdige fag ikke foreslås
+  - at obliger teller i planen uten å bli behandlet som eksamensdager
+  - påminnelser
+  - innholdet i kalenderfilen
+  - at uferdige oppgaver flytter seg
+- Testet i nettleseren i mobilstørrelse:
+  - Gamle eksamener ble gjort om til fag.
+  - En ny oblig med frist i morgen flyttet faget opp i dagens forslag.
+  - «Levert» fjernet fristen og senket faget i forslagene.
+  - Både «Les» og fagforslaget velger riktig fag i timeren.
+  - Oppgaver kan legges til og krysses av.
+- **Feil funnet og rettet:**
+  - Når en eksamen og en frist var nær samme dag, nevnte «Hvorfor?» bare eksamenen. Den automatiske testen fant dette,
+    og nå nevnes frister med forfall den dagen alltid.
+  - Fagforslagene ble klemt sammen ved siden av «Les»-knappen og er flyttet under, så de får hele bredden.
+  - «Slå på varsler» var trykkbar selv når nettleseren hadde blokkert varsler. Nå er knappen deaktivert, og det står hvorfor.
+
+### Skjermbilder – versjon 5
+
+| Frister og ukemål | Dagens fag og oppgaver | Fagene dine |
+|---|---|---|
+| ![Frister](skjermbilder/versjon-5/1-frister-og-ukemaal.jpg) | ![I dag](skjermbilder/versjon-5/2-dagens-fag-og-oppgaver.jpg) | ![Fag](skjermbilder/versjon-5/3-fagene-dine.jpg) |
+
+| Obliger i et fag | Velg fag i timeren | Påminnelser |
+|---|---|---|
+| ![Obliger](skjermbilder/versjon-5/4-obliger.jpg) | ![Timer](skjermbilder/versjon-5/5-timer-velg-fag.jpg) | ![Påminnelser](skjermbilder/versjon-5/6-paaminnelser.jpg) |
 
 ---
 

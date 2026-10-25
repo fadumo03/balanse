@@ -137,6 +137,7 @@
         golden: !!active.golden,
         bloomed: false,
         revived: true,
+        subjectId: active.subjectId || null,
         end: nowMs
       });
       delete session.wanted;
@@ -149,6 +150,7 @@
         status: "grown",
         golden: !!active.golden,
         bloomed: false,
+        subjectId: active.subjectId || null,
         end: nowMs
       };
       state.sessions.push(session);

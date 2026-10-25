@@ -40,6 +40,7 @@
         </div>
       </header>
       <div id="streak-card"></div>
+      <div id="reminders"></div>
       <div id="week-summary" class="card summary"></div>
       <div id="log-prompt"></div>
       <div id="days"></div>
@@ -103,26 +104,38 @@
       </div>
     </section>
 
-    <!-- EKSAMENER -->
-    <section id="view-exams" class="view" aria-label="Eksamener">
-      <header class="top"><div class="top-title"><p class="eyebrow">Eksamener</p><h1>Eksamener</h1></div></header>
-      <p class="lead">Lesetiden øker når eksamen nærmer seg.</p>
-      <form id="exam-form" class="card">
-        <label class="field">Fag
-          <input type="text" id="exam-subject" placeholder="F.eks. Matematikk 1" maxlength="40" required>
-        </label>
-        <label class="field">Dato
-          <input type="date" id="exam-date" required>
-        </label>
-        <button type="submit" class="primary">Legg til eksamen</button>
-      </form>
-      <ul id="exam-list" class="list"></ul>
+    <!-- FAG -->
+    <section id="view-exams" class="view" aria-label="Fag">
+      <div id="subjects-main">
+        <header class="top"><div class="top-title"><p class="eyebrow">Fag</p><h1>Fagene dine</h1></div></header>
+        <p class="lead">Legg inn fag, eksamener og obliger. Appen bruker dem til å foreslå hva du bør lese hver dag.</p>
+        <ul id="subject-list" class="list"></ul>
+        <form id="subject-form" class="card">
+          <h2>Nytt fag</h2>
+          <label class="field">Navn
+            <input type="text" id="subject-name" placeholder="F.eks. Matematikk 1" maxlength="40" required>
+          </label>
+          <fieldset class="field">
+            <legend>Hvor vanskelig er faget for deg?</legend>
+            <div class="segmented three" id="new-difficulty">
+              <button type="button" data-diff="1">Lett</button>
+              <button type="button" data-diff="2" class="on">Middels</button>
+              <button type="button" data-diff="3">Vanskelig</button>
+            </div>
+          </fieldset>
+          <label class="field">Eksamensdato <span class="muted">(valgfritt)</span>
+            <input type="date" id="subject-exam">
+          </label>
+          <button type="submit" class="primary">Legg til fag</button>
+        </form>
+      </div>
+      <div id="subject-detail" hidden></div>
     </section>
 
     <!-- INNSTILLINGER -->
     <section id="view-goals" class="view" aria-label="Innstillinger">
       <header class="top"><div class="top-title"><p class="eyebrow">Tilpass appen</p><h1>Innstillinger</h1></div></header>
-      <p class="lead">Endre målene dine, treningsøktene, tema og data.</p>
+      <p class="lead">Endre målene dine, treningsøktene, påminnelser, tema og data.</p>
       <form id="goals-form" class="card">
         <h2>Mål for uka</h2>
         <p class="muted small">Utgangspunktet for en vanlig, rolig uke. Appen justerer ut fra eksamener og søvn.</p>
@@ -146,6 +159,15 @@
         <div id="templates"></div>
       </div>
       <div class="card">
+        <h2>Påminnelser om frister</h2>
+        <p class="muted small">Frister vises alltid øverst i ukeplanen når de nærmer seg. Du kan også få varsel på telefonen når du åpner appen.
+          Vil du ha varsel selv når appen er lukket, kan du legge fristene i kalenderen fra hvert fag.</p>
+        <div class="row-buttons">
+          <button type="button" id="notify-toggle"></button>
+        </div>
+        <p id="notify-status" class="feedback"></p>
+      </div>
+      <div class="card">
         <h2>Tema</h2>
         <div id="theme-picker" class="themes"></div>
       </div>
@@ -164,7 +186,7 @@
     <button data-view="week" class="on"><span data-icon="calendar"></span>Uke</button>
     <button data-view="log"><span data-icon="moon"></span>Logg</button>
     <button data-view="garden"><span data-icon="sprout"></span>Hage</button>
-    <button data-view="exams"><span data-icon="cap"></span>Eksamener</button>
+    <button data-view="exams"><span data-icon="book"></span>Fag</button>
     <button data-view="goals"><span data-icon="sliders"></span>Innstillinger</button>
   </nav>
 
@@ -176,6 +198,10 @@
         <h2>Hva vil du plante?</h2>
         <p class="muted center">Lengre økt i strekk gir en finere plante.</p>
         <div id="seed-list" class="seed-list"></div>
+        <div id="subject-pick-wrap">
+          <p class="pick-label">Hva leser du?</p>
+          <div id="subject-pick" class="chips"></div>
+        </div>
         <div id="exam-banner"></div>
         <label id="golden-wrap" class="golden-toggle" hidden>
           <input type="checkbox" id="use-golden">

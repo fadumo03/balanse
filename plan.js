@@ -94,11 +94,12 @@
     return 0;
   }
 
+  // exams kan også inneholde frister (kind "oblig"), som teller litt mindre (weight).
   function pressureFor(dayKey, exams) {
     let best = { value: 0, exam: null, days: null };
     for (const exam of exams || []) {
       const days = daysBetween(dayKey, exam.date);
-      const value = pressureFromDays(days);
+      const value = pressureFromDays(days) * (exam.weight === undefined ? 1 : exam.weight);
       if (value > best.value || (value === best.value && value > 0 && days < best.days)) {
         best = { value, exam, days };
       }
@@ -156,7 +157,8 @@
       const pressure = pressures[i];
       const readiness = readinessFor(key, logs, todayKey);
       const tired = readiness !== null && readiness.value < 0.4;
-      const isExamDay = pressure.days === 0;
+      const isExamDay = pressure.days === 0 && (pressure.exam.kind || "exam") === "exam";
+      const isOblig = pressure.exam && pressure.exam.kind === "oblig";
       const isWeekend = i >= 5;
       const reasons = [];
 
@@ -168,7 +170,9 @@
       } else {
         const base = isWeekend && pressure.value < 0.4 ? settings.studyBase * 0.6 : settings.studyBase;
         study = base + pressure.value * (settings.studyMax - base);
-        if (pressure.exam) {
+        if (isOblig) {
+          if (pressure.days > 0) reasons.push(`${pressure.days} dager til fristen for ${pressure.exam.subject} – mer lesetid.`);
+        } else if (pressure.exam) {
           reasons.push(`${pressure.days} dager til ${pressure.exam.subject} – mer lesetid.`);
         }
         if (tired) {
@@ -177,6 +181,11 @@
         }
       }
       study = Math.max(0, roundTo(study, 15));
+
+      // Frister som går ut i dag nevnes alltid, også når en eksamen veier tyngre.
+      for (const item of exams) {
+        if (item.kind === "oblig" && daysBetween(key, item.date) === 0) reasons.push(`Frist i dag: ${item.subject}.`);
+      }
 
       // Trening
       let training = null;
@@ -244,8 +253,146 @@
     };
   }
 
+  // ---------- Fag, frister og dagens oppgaver ----------
+  const DIFFICULTY = {
+    1: { label: "Lett", weight: 1 },
+    2: { label: "Middels", weight: 1.5 },
+    3: { label: "Vanskelig", weight: 2 }
+  };
+  const OBLIG_WEIGHT = 0.6; // en frist teller litt mindre enn en eksamen
+
+  function whenText(days) {
+    if (days === 0) return "i dag";
+    if (days === 1) return "i morgen";
+    return `om ${days} dager`;
+  }
+
+  // Eksamener og åpne obliger fra alle fag, i formatet buildWeek forventer.
+  function planItems(subjects) {
+    const items = [];
+    for (const s of subjects || []) {
+      if (s.examDate) items.push({ id: s.id, subject: s.name, date: s.examDate, kind: "exam" });
+      for (const o of s.obliger || []) {
+        if (!o.done) items.push({ id: o.id, subject: `${s.name}: ${o.title}`, date: o.due, kind: "oblig", weight: OBLIG_WEIGHT });
+      }
+    }
+    return items;
+  }
+
+  // Bare eksamener (brukes til eksamensblomsten i hagen).
+  function examsOf(subjects) {
+    return planItems(subjects).filter((x) => x.kind === "exam");
+  }
+
+  // Hvor viktig et fag er akkurat nå (0–1), og hvorfor.
+  function subjectUrgency(subject, dayKey) {
+    let best = { value: 0, reason: null };
+    if (subject.examDate) {
+      const d = daysBetween(dayKey, subject.examDate);
+      const v = pressureFromDays(d);
+      if (v > best.value) best = { value: v, reason: `eksamen ${whenText(d)}` };
+    }
+    for (const o of subject.obliger || []) {
+      if (o.done) continue;
+      const d = daysBetween(dayKey, o.due);
+      const v = d < 0 ? 0.7 : pressureFromDays(d) * OBLIG_WEIGHT;
+      if (v > best.value) best = { value: v, reason: d < 0 ? `${o.title} er på overtid` : `${o.title} ${whenText(d)}` };
+    }
+    return best;
+  }
+
+  function isActiveSubject(subject, dayKey) {
+    const examPassed = subject.examDate && daysBetween(dayKey, subject.examDate) < 0;
+    const openOblig = (subject.obliger || []).some((o) => !o.done);
+    return !examPassed || openOblig;
+  }
+
+  // Fordeler dagens lesetid på de 1–3 viktigste fagene ut fra vanskelighetsgrad og hvor nær eksamen/frister er.
+  function suggestSubjects(subjects, dayKey, minutes) {
+    const active = (subjects || []).filter((s) => isActiveSubject(s, dayKey));
+    if (!active.length || minutes <= 0) return [];
+    const scored = active.map((s) => {
+      const u = subjectUrgency(s, dayKey);
+      const diff = DIFFICULTY[s.difficulty] || DIFFICULTY[2];
+      return {
+        subjectId: s.id,
+        name: s.name,
+        score: diff.weight * (0.25 + u.value),
+        reason: u.reason || `${diff.label.toLowerCase()} fag`
+      };
+    }).sort((a, b) => b.score - a.score);
+
+    const count = minutes < 75 ? 1 : minutes < 150 ? 2 : 3;
+    const top = scored.slice(0, count);
+    const total = top.reduce((sum, x) => sum + x.score, 0);
+    let left = minutes;
+    return top.map((x, i) => {
+      const share = i === top.length - 1 ? left : Math.max(15, roundTo((minutes * x.score) / total, 15));
+      const m = Math.max(0, Math.min(left, share));
+      left -= m;
+      return { subjectId: x.subjectId, name: x.name, minutes: m, reason: x.reason };
+    }).filter((x) => x.minutes > 0);
+  }
+
+  // Obliger som nærmer seg (innenfor påminnelsen) eller er på overtid.
+  function dueReminders(subjects, todayKey) {
+    const out = [];
+    for (const s of subjects || []) {
+      for (const o of s.obliger || []) {
+        if (o.done) continue;
+        const days = daysBetween(todayKey, o.due);
+        const remind = o.remind === undefined ? 3 : o.remind;
+        if (days <= remind) out.push({ subject: s, oblig: o, days });
+      }
+    }
+    return out.sort((a, b) => a.days - b.days);
+  }
+
+  // Dagens oppgaver: i dag vises også uferdige oppgaver fra tidligere dager.
+  function tasksForDay(tasks, dayKey, todayKey) {
+    return (tasks || []).filter((t) => {
+      if (dayKey === todayKey) return (!t.done && t.day <= todayKey) || (t.done && t.doneDay === todayKey);
+      if (dayKey < todayKey) return t.done && t.doneDay === dayKey;
+      return !t.done && t.day === dayKey;
+    });
+  }
+
+  // Kalenderfil (.ics) for frister, med alarm på fristdagen og X dager før,
+  // så telefonens kalender varsler selv når appen er lukket.
+  function icsFor(subjectName, obliger, now) {
+    const stamp = (now || new Date()).toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+    const esc = (s) => String(s).replace(/[\\,;]/g, (c) => `\\${c}`);
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Balanse//NO", "CALSCALE:GREGORIAN"];
+    for (const o of obliger) {
+      const remind = o.remind === undefined ? 3 : o.remind;
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:${o.id}@balanse`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART:${o.due.replace(/-/g, "")}T090000`,
+        "DURATION:PT1H",
+        `SUMMARY:${esc(`Frist: ${subjectName} – ${o.title}`)}`,
+        "DESCRIPTION:Lagt inn fra Balanse.",
+        "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${esc(o.title)}`, "TRIGGER:-PT0M", "END:VALARM"
+      );
+      if (remind > 0) lines.push("BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${esc(o.title)}`, `TRIGGER:-P${remind}D`, "END:VALARM");
+      lines.push("END:VEVENT");
+    }
+    lines.push("END:VCALENDAR");
+    return lines.join("\r\n");
+  }
+
   const api = {
     DEFAULT_SETTINGS,
+    DIFFICULTY,
+    icsFor,
+    planItems,
+    examsOf,
+    subjectUrgency,
+    suggestSubjects,
+    dueReminders,
+    tasksForDay,
+    whenText,
     DEFAULT_TEMPLATES,
     ACTIVITIES,
     templateFor,
