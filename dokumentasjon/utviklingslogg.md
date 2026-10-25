@@ -534,6 +534,9 @@ Etter første forsøk, der kalenderen glir opp fra bunnen og dekker halve skjerm
 
   KI-en sendte et nytt utkast (`p-ed6ecfbc`) med bare det nye forsidebildet og videoen, og teksten uten testene.
   Det første utkastet (`p-f92c459c`) ligger fortsatt på samme gjennomgangslenke, men skal ikke publiseres.
+- **Publisert** av meg (brukernavn @meem03, uten ekte navn eller e-post):
+  <https://vibeoff.ai/build/jeg-lagde-en-ukeplan-der-lesing-gror-en-hage-og-trening-ed6ecfbc>.
+  KI-en sjekket etterpå at siden er offentlig, at videoen er med, og at «28 automatiske tester» ikke står der.
 
 ---
 

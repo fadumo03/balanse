@@ -1,5 +1,8 @@
 # Balanse – studie og trening i én ukeplan
 
+**Demo (video):** <https://vibeoff.ai/build/jeg-lagde-en-ukeplan-der-lesing-gror-en-hage-og-trening-ed6ecfbc>
+· Videoen ligger også i repoet: [`dokumentasjon/balanse-demo.webm`](dokumentasjon/balanse-demo.webm)
+
 **Balanse** er en mobilapp (web-app/PWA) som lager en ukeplan for både lesing og trening.
 Appen kjenner eksamensdatoene og treningsmålene dine:
 
