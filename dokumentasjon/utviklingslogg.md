@@ -414,6 +414,25 @@ dagens oppgaver, og at timeren vet hvilket fag du leser. Jeg la til:
 
 ---
 
+## Forbedring – «Levert» som avkrysning
+
+### Min prompt
+
+> levert knappen får d til å virke som jeg HAR levert og ikke som en check knapp
+
+### Hva KI-en gjorde
+
+- «Levert»-knappen i Frister-kortet er byttet ut med en avkrysningsboks foran hver frist, slik oppgavene og obligfanen har.
+- Nederst i kortet står det «Kryss av når du har levert».
+- Meldingen etterpå sier «… er markert som levert», så det er tydelig at det er noe du gjorde, ikke en status appen satte.
+
+### Testing
+
+- En midlertidig testoblig med frist i morgen ble lagt inn og krysset av med et ekte klikk. Den forsvant fra Frister-kortet
+  og ble lagret som levert. Etterpå ble den fjernet igjen.
+
+---
+
 ## Neste versjon
 
 *(Legg til nye runder her: hva du ba om, hva som ble endret, og hvordan det ble testet.)*

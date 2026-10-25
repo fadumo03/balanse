@@ -238,13 +238,14 @@
         <h2><span class="h-ico">${icon("clock")}</span>Frister</h2>
         ${list.map(({ subject, oblig, days }) => `
           <div class="reminder ${days < 0 ? "late" : days <= 1 ? "soon" : ""}">
+            <input type="checkbox" data-oblig-done="${subject.id}:${oblig.id}" aria-label="Marker ${escapeHtml(oblig.title)} som levert">
             <button class="reminder-text" data-open-subject="${subject.id}" data-subtab="obliger">
               <strong>${escapeHtml(oblig.title)}</strong>
               <small>${escapeHtml(subject.name)} · ${fmtDay(oblig.due)}</small>
             </button>
             <span class="chip ${days <= 1 ? "exam" : ""}">${dueText(days)}</span>
-            <button class="small-btn" data-oblig-done="${subject.id}:${oblig.id}">Levert</button>
           </div>`).join("")}
+        <p class="muted small reminder-hint">Kryss av når du har levert.</p>
       </div>`;
   }
 
@@ -256,7 +257,7 @@
     save();
     renderAll();
     if (done) {
-      toast(`${o.title} er levert. Bra jobba!`);
+      toast(`${o.title} er markert som levert. Bra jobba!`);
       confetti(30);
     }
   }
@@ -604,10 +605,10 @@
     });
   });
 
-  $("reminders").addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-oblig-done]");
-    if (!btn) return;
-    const [sid, oid] = btn.dataset.obligDone.split(":");
+  $("reminders").addEventListener("change", (e) => {
+    const box = e.target.closest("[data-oblig-done]");
+    if (!box || !box.checked) return;
+    const [sid, oid] = box.dataset.obligDone.split(":");
     setObligDone(sid, oid, true);
   });
 
